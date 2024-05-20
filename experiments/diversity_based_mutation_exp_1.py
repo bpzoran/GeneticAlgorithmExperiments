@@ -8,20 +8,47 @@ from gadapt.utils import ga_utils
 
 from exp_logging import init_logging, log_message_info
 
-num_runs = 100
+num_runs = 10
 logging_step = 50
 
 
-def execute_experiment_1():
+def simple_trig_func(args):
     """
-    The execute_experiment function performs optimization using genetic algorithms (GAs) with different mutation strategies. It utilizes two libraries, PyGAD and GAdapt, to optimize a trigonometric function over multiple runs, comparing the performance of adaptive, random, and diversity mutation strategies.
-    Example Usage
-    # Assuming the execute_experiment function is defined and imported
-    execute_experiment()
-    # This will run the optimization process and print the results of different mutation strategies.
-    Code Analysis
-    Inputs
-    The function does not take any external inputs and uses predefined values within its scope.
+    The simple_trig_func function computes a mathematical expression using trigonometric
+    and arithmetic operations on elements of an input array.
+
+    This function performs the following steps:
+
+    1. Computes the sine of the first element (args[0]).
+    2. Computes the cosine of the second element (args[1]).
+    3. Adds the square of the third element (args[2]).
+    4. Multiplies the sine of the fourth element (args[3]) by the cosine of the fifth element (args[4]) and adds the result.
+    5. Adds the value of the sixth element (args[5]).
+    6. Multiplies the cosine of the seventh element (args[6]) by the eighth element (args[7]) and adds the result.
+
+    The function ensures that the input list contains exactly 8 elements. If not, it raises a ValueError.
+
+    Each operation in this function is independent of the others, but each can contain one or more local minima,
+    making the function useful for optimization experiments.
+
+    Parameters:
+    args (list): A list of 8 numerical values used as input for the function.
+
+    Returns:
+    float: The result of the mathematical expression.
+    """
+    if len(args) != 8:
+        raise ValueError("Input vector must contain 8 variables.")
+    return np.sin(args[0]) + np.cos(args[1]) + args[2] ** 2 + np.sin(args[3]) * np.cos(args[4]) + args[5] + np.cos(
+        args[6]) * args[7]
+
+
+def execute_diversity_based_mutation_exp_1():
+    """
+    The execute_diversity_based_mutation_exp_1 function performs
+    optimization using genetic algorithms (GAs) with different mutation strategies.
+    It utilizes two libraries, PyGAD and GAdapt, to optimize a trigonometric function over multiple runs,
+    comparing the performance of adaptive, random, and diversity mutation strategies.
 
     Flow
     Define a trigonometric function to optimize.
@@ -31,11 +58,6 @@ def execute_experiment_1():
     Print final results from all optimization strategies.
     """
     init_logging(log_to_file=True)
-    def simple_trig_func(args):
-        if len(args) != 8:
-            raise ValueError("Input vector must contain 8 variables.")
-        return np.sin(args[0]) + np.cos(args[1]) + args[2] ** 2 + np.sin(args[3]) * np.cos(args[4]) + args[5] + np.cos(
-            args[6]) * args[7]
 
     result_list = []
 
@@ -108,7 +130,8 @@ def execute_experiment_1():
             percentage_of_mutation_genes=40,
             exit_check="min_cost",
             keep_elitism_percentage=50,
-            max_attempt_no=10)
+            max_attempt_no=10,
+            logging=True)
 
     # Addition of variables with specified ranges and steps
     ga.add(min_value=0.0, max_value=math.pi, step=0.0157)
@@ -162,7 +185,8 @@ def execute_experiment_1():
             percentage_of_mutation_genes=50,
             keep_elitism_percentage=50,
             exit_check="min_cost",
-            max_attempt_no=10)
+            max_attempt_no=10,
+            logging=True)
 
     # Addition of variables with specified ranges and steps
     ga.add(min_value=0.0, max_value=math.pi, step=0.0157)
@@ -207,5 +231,7 @@ def execute_experiment_1():
     log_message_info("************Final results:************")
     for r in result_list:
         log_message_info(r)
+
+
 if __name__ == "__main__":
-    execute_experiment_1()
+    execute_diversity_based_mutation_exp_1()
