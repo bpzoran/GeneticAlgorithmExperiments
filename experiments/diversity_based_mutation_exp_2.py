@@ -8,7 +8,7 @@ from gadapt.utils import ga_utils
 
 from exp_logging import log_message_info, init_logging
 
-num_runs = 100
+num_runs = 1000
 logging_step = 50
 
 
