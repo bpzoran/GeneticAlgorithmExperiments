@@ -130,8 +130,7 @@ def execute_diversity_based_mutation_exp_1():
             percentage_of_mutation_genes=40,
             exit_check="min_cost",
             keep_elitism_percentage=50,
-            max_attempt_no=10,
-            logging=True)
+            max_attempt_no=10)
 
     # Addition of variables with specified ranges and steps
     ga.add(min_value=0.0, max_value=math.pi, step=0.0157)
@@ -185,8 +184,7 @@ def execute_diversity_based_mutation_exp_1():
             percentage_of_mutation_genes=50,
             keep_elitism_percentage=50,
             exit_check="min_cost",
-            max_attempt_no=10,
-            logging=True)
+            max_attempt_no=10)
 
     # Addition of variables with specified ranges and steps
     ga.add(min_value=0.0, max_value=math.pi, step=0.0157)

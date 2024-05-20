@@ -8,12 +8,8 @@ from gadapt.utils.TimeStampFormatter import TimestampFormatter
 
 def init_logging(log_to_file: bool):
     """
-    Initializes logging for genetic algorithm
+    Initializes logging for genetic algorithm expperiments
     """
-
-    # Get platform-specific path separator
-    path_separator = os.path.sep
-
     path = os.path.join(os.getcwd(), "log")
     if not os.path.exists(path):
         os.mkdir(path)
