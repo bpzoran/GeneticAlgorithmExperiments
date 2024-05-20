@@ -63,7 +63,7 @@ pip install -r requirements.txt
 ```
 
 ### Running the Experiments
-To run the experiments, execute the following commands:
+To run the experiments, execute the following commands from `experiments` folder:
 ```bash
 python diversity_based_mutation_exp_1.py
 python diversity_based_mutation_exp_2.py
