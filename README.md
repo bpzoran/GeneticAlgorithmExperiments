@@ -72,8 +72,11 @@ python diversity_based_mutation_exp_2.py
 
 ### Requirements
 Python 3.6 or higher
+
 gadapt==0.4.9
+
 pygad==3.3.1
+
 The required libraries are listed in requirements.txt.
 
 ### Logging
