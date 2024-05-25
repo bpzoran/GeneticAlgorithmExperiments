@@ -8,7 +8,7 @@ from gadapt.utils import ga_utils
 
 from exp_logging import init_logging, log_message_info
 
-num_runs = 100
+num_runs = 1000
 logging_step = 50
 
 
@@ -213,11 +213,11 @@ def execute_diversity_based_mutation_exp_1():
             best_fitnesses.append(best_solution_fitness)
             generations_completed.append(ga_instance.generations_completed)
             if i % logging_step == 0:
-                log_message_info(f"PyGAD - Optimization number {i}.")
-                log_message_info(f"PyGAD - Average best fitness: {-np.mean(best_fitnesses)}")
-                log_message_info(f"PyGAD - Average generations completed: {np.mean(generations_completed)}")
-        pygad_avg_fitness = f"PyGAD - Final average best fitness: {-np.mean(best_fitnesses)}"
-        pygad_avg_generation_number = f"PyGAD - Final average generations completed: {np.mean(generations_completed)}"
+                log_message_info(f"PyGAD - adaptive mutation - Optimization number {i}.")
+                log_message_info(f"PyGAD - adaptive mutation - Average best fitness: {-np.mean(best_fitnesses)}")
+                log_message_info(f"PyGAD - adaptive mutation - Average generations completed: {np.mean(generations_completed)}")
+        pygad_avg_fitness = f"PyGAD - adaptive mutation - Final average best fitness: {-np.mean(best_fitnesses)}"
+        pygad_avg_generation_number = f"PyGAD - adaptive mutation - Final average generations completed: {np.mean(generations_completed)}"
 
         log_message_info(pygad_avg_fitness)
         log_message_info(pygad_avg_generation_number)
