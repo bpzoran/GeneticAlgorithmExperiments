@@ -6,8 +6,9 @@ This repository contains a Python project for conducting genetic algorithm optim
 
 The project consists of the following modules:
 
-- `diversity_based_mutation_exp_1.py`: Implements an experiment optimizing a simple trigonometric function using different mutation strategies.
-- `diversity_based_mutation_exp_2.py`: Implements an experiment optimizing a complex trigonometric function using different mutation strategies.
+- `diversity_based_mutation_use_case_1.py`: Implements an experiment optimizing a simple trigonometric function using different mutation strategies.
+- `diversity_based_mutation_use_case_2.py`: Implements an experiment optimizing a complex trigonometric function using different mutation strategies.
+- `ddiversity_based_mutation_use_case_3.py`: Implements an experiment optimizing a arithmetic/trigonometric function using different mutation strategies.
 - `exp_logging.py`: Provides logging utilities to record the experiments' progress and results.
 
 ## Experiment Details
@@ -24,11 +25,6 @@ def simple_trigonometric_arithmetic_function(args):
     term5 = math.sqrt(abs(args[4]))
 
     return term1 + term2 + term3 + term4 + term5
-The module uses the following optimization strategies:
-
-1. PyGAD with Adaptive Mutation
-2. GAdapt with Random Mutation
-3. GAdapt with Diversity Mutation
 ```
 
 The module uses the following optimization strategies:
@@ -90,9 +86,9 @@ pip install -r requirements.txt
 ### Running the Experiments
 To run the experiments, execute the following commands from `experiments` folder:
 ```bash
-python diversity_based_mutation_exp_1.py
-python diversity_based_mutation_exp_2.py
-
+python diversity_based_mutation_use_case_1.py
+python diversity_based_mutation_use_case_2.py
+python diversity_based_mutation_use_case_3.py
 ```
 
 ### Requirements
