@@ -32,9 +32,9 @@ def simple_trigonometric_arithmetic_function(args):
     return term1 + term2 + term3 + term4 + term5
 
 
-def execute_diversity_based_mutation_exp_1():
+def execute_diversity_based_mutation_use_case_1():
     """
-    The function execute_diversity_based_mutation_exp_1 orchestrates the execution of genetic algorithm optimizations
+    The function diversity_based_mutation_use_case_2 orchestrates the execution of genetic algorithm optimizations
     using different mutation strategies across multiple runs. It leverages the libraries PyGAD and GAdapt to optimize a
     trigonometric function, comparing the outcomes of adaptive, random, and diversity-based mutations.
     """
@@ -205,4 +205,4 @@ def execute_diversity_based_mutation_exp_1():
 
 
 if __name__ == "__main__":
-    execute_diversity_based_mutation_exp_1()
+    execute_diversity_based_mutation_use_case_1()

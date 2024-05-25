@@ -12,24 +12,32 @@ The project consists of the following modules:
 
 ## Experiment Details
 
-### diversity_based_mutation_exp_1.py
-
+## diversity_based_mutation_use_case_1.py
 This module performs optimization on a simple trigonometric function using genetic algorithms (GAs) with different mutation strategies. The function being optimized is:
 
 ```python
-def simple_trig_func(args):
-    if len(args) != 8:
-        raise ValueError("Input vector must contain 8 variables.")
-    return np.sin(args[0]) + np.cos(args[1]) + args[2] ** 2 + np.sin(args[3]) * np.cos(args[4]) + args[5] + np.cos(args[6]) * args[7]
+def simple_trigonometric_arithmetic_function(args):
+    term1 = math.sqrt(args[0])
+    term2 = math.cos(args[1]) ** 2
+    term3 = math.sin(args[2])
+    term4 = args[3] ** 2
+    term5 = math.sqrt(abs(args[4]))
+
+    return term1 + term2 + term3 + term4 + term5
+The module uses the following optimization strategies:
+
+1. PyGAD with Adaptive Mutation
+2. GAdapt with Random Mutation
+3. GAdapt with Diversity Mutation
 ```
+
 The module uses the following optimization strategies:
 
 1. PyGAD with Adaptive Mutation
 2. GAdapt with Random Mutation
 3. GAdapt with Diversity Mutation
 
-
-## diversity_based_mutation_exp_2.py
+## diversity_based_mutation_use_case_2.py
 This module performs optimization on a complex trigonometric function using genetic algorithms (GAs) with different mutation strategies. The function being optimized is:
 
 ```python
@@ -51,6 +59,23 @@ The module uses the following optimization strategies:
 1. PyGAD with Adaptive Mutation
 2. GAdapt with Random Mutation
 3. GAdapt with Diversity Mutation
+
+### diversity_based_mutation_use_case_3.py
+
+This module performs optimization on a simple trigonometric function using genetic algorithms (GAs) with different mutation strategies. The function being optimized is:
+
+```python
+def simple_trig_func(args):
+    if len(args) != 8:
+        raise ValueError("Input vector must contain 8 variables.")
+    return np.sin(args[0]) + np.cos(args[1]) + args[2] ** 2 + np.sin(args[3]) * np.cos(args[4]) + args[5] + np.cos(args[6]) * args[7]
+```
+The module uses the following optimization strategies:
+
+1. PyGAD with Adaptive Mutation
+2. GAdapt with Random Mutation
+3. GAdapt with Diversity Mutation
+
 
 ## exp_logging.py
 
