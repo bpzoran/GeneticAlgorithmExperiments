@@ -8,7 +8,7 @@ from gadapt.utils import ga_utils
 
 from exp_logging import log_message_info, init_logging
 
-num_runs = 10
+num_runs = 1000
 logging_step = 50
 number_of_generations = 40
 
