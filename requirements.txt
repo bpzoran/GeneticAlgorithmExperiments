@@ -1,2 +1,2 @@
-gadapt==0.4.9
+gadapt==0.4.10
 pygad==3.3.1
