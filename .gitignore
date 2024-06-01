@@ -2,3 +2,4 @@
 experiments/log/*
 *.pyc
 .idea/*
+/experiments/test01.py
