@@ -91,6 +91,25 @@ python diversity_based_mutation_use_case_2.py
 python diversity_based_mutation_use_case_3.py
 ```
 
+Default number of runs for each tested strategy is 1000. For custom number of runs add parameter to the command. For example:
+
+```bash
+python diversity_based_mutation_use_case_1.py 100
+```
+will execute each strategy 1000 times.
+
+For plotting fitness per generation add parameter `plot` to the command. For example:
+```bash
+python diversity_based_mutation_use_case_2.py plot
+```
+will plot fitness per generation for the final run of each strategy.
+
+Custom number of runs and `plot` parameter can be combined. For example:
+```bash
+python diversity_based_mutation_use_case_3.py plot 20
+```
+will execute each strategy 20 times and draw the fitness per generation of the final run for each strategy.
+
 ### Requirements
 Python 3.6 or higher
 
