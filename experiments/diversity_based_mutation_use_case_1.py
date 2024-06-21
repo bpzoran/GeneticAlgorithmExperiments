@@ -13,7 +13,7 @@ import sys
 
 num_runs = 1000
 logging_step = 50
-number_of_generations = 30
+number_of_generations = 40
 plot_fitness = False
 
 
