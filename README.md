@@ -113,7 +113,7 @@ will execute each strategy 20 times and draw the fitness per generation of the f
 ### Requirements
 Python 3.6 or higher
 
-gadapt==0.4.17
+gadapt==0.4.18
 
 pygad==3.3.1
 
