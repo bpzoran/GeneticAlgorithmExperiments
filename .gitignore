@@ -5,3 +5,4 @@ experiments/log/*
 /experiments/test01.py
 /experiments/test02.py
 experiments/plots/*
+.venv/*
