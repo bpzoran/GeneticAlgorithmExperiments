@@ -1,4 +1,7 @@
+import sys
 from collections.abc import Callable
+from typing import Optional
+
 import pygad
 
 from gadapt.ga import GA
@@ -18,15 +21,19 @@ class Experiment:
         self.args_bounds = args_bounds
         self.app_settings = ExperimentGASettings()
 
-    def fill_args_with_same_values(self, low: float, high: float, step: float, number_of_args: int) -> None:
-        self.args_bounds.clear()
-        for _ in range(number_of_args):
-            self.args_bounds.append({"low": low, "high": high, "step": step})
+    def fill_args_with_same_values(self, low: float, high: float,  number_of_args: int, step: Optional[float] = None) -> None:
+        bounds = {"low": low, "high": high, **({"step": step} if step is not None else {})}
+        self.args_bounds = [bounds.copy() for _ in range(number_of_args)]
 
 
     def fill_gadapt_with_args(self, ga: GA) -> None:
         for ab in self.args_bounds:
-            ga.add(min_value=ab["low"], max_value=ab["high"], step=ab["step"])
+            step = ab.get("step")
+            if step is None:
+                step = sys.float_info.min
+            low = ab.get("low")
+            high = ab.get("high")
+            ga.add(min_value=low, max_value=high, step=step)
 
 
     # Define fitness function
@@ -40,17 +47,17 @@ class Experiment:
             # Define min, max values, and steps for each parameter
             def get_ga_instance():
                  return pygad.GA(num_generations=1000,
-                                num_parents_mating=16,
+                                num_parents_mating=round((self.app_settings.keep_elitism_percentage / 100) * self.app_settings.population_size),
                                 parent_selection_type="sss",
-                                sol_per_pop=64,
+                                sol_per_pop=self.app_settings.population_size,
                                 num_genes=len(self.args_bounds),
                                 gene_type=float,
                                 gene_space=self.args_bounds,
                                 fitness_func=self.fitness_func,
-                                mutation_percent_genes=50,
+                                mutation_percent_genes=self.app_settings.percentage_of_mutation_genes,
                                 mutation_type="random",
                                 suppress_warnings=True,
-                                keep_elitism=32,
+                                keep_elitism=round((self.app_settings.keep_elitism_percentage / 100) * self.app_settings.population_size),
                                 stop_criteria=f"saturate_{self.app_settings.saturation_criteria}"
                                 )
 
@@ -61,14 +68,14 @@ class Experiment:
             ##### GADAPT OPTIMIZATION WITH RANDOM MUTATION ###############
 
             ga = GA(cost_function=self.f,
-                    population_size=64,
+                    population_size=self.app_settings.population_size,
                     population_mutation="random",
                     chromosome_mutation="random",
                     gene_mutation="random",
-                    percentage_of_mutation_chromosomes=80,
-                    percentage_of_mutation_genes=50,
+                    percentage_of_mutation_chromosomes=self.app_settings.percentage_of_mutation_chromosomes,
+                    percentage_of_mutation_genes=self.app_settings.percentage_of_mutation_genes,
                     exit_check="min_cost",
-                    keep_elitism_percentage=50,
+                    keep_elitism_percentage=self.app_settings.keep_elitism_percentage,
                     max_attempt_no=self.app_settings.saturation_criteria,
                     logging=False)
 
@@ -81,14 +88,14 @@ class Experiment:
             ##### GADAPT OPTIMIZATION WITH DIVERSITY MUTATION ###############
 
             ga = GA(cost_function=self.f,
-                    population_size=64,
+                    population_size=self.app_settings.population_size,
                     population_mutation="cost_diversity, cross_diversity, parent_diversity, random",
                     chromosome_mutation="cross_diversity,random",
                     gene_mutation="cross_diversity,random",
-                    percentage_of_mutation_chromosomes=80,
-                    percentage_of_mutation_genes=50,
+                    percentage_of_mutation_chromosomes=self.app_settings.percentage_of_mutation_chromosomes,
+                    percentage_of_mutation_genes=self.app_settings.percentage_of_mutation_genes,
                     exit_check="min_cost",
-                    keep_elitism_percentage=50,
+                    keep_elitism_percentage=self.app_settings.keep_elitism_percentage,
                     max_attempt_no=self.app_settings.saturation_criteria,
                     logging=False)
 
@@ -102,9 +109,9 @@ class Experiment:
 
             def get_ga_instance():
                 return pygad.GA(num_generations=1000,
-                                num_parents_mating=16,
+                                num_parents_mating=round((self.app_settings.keep_elitism_percentage / 100) * self.app_settings.population_size),
                                 parent_selection_type="sss",
-                                sol_per_pop=64,
+                                sol_per_pop=self.app_settings.population_size,
                                 num_genes=len(self.args_bounds),
                                 gene_type=float,
                                 gene_space=self.args_bounds,
@@ -112,7 +119,7 @@ class Experiment:
                                 mutation_percent_genes=[60, 40],
                                 mutation_type="adaptive",
                                 suppress_warnings=True,
-                                keep_elitism=32,
+                                keep_elitism=round((self.app_settings.keep_elitism_percentage / 100) * self.app_settings.population_size),
                                 stop_criteria=f"saturate_{self.app_settings.saturation_criteria}"
                                 )
 

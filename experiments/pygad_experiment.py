@@ -38,12 +38,12 @@ def execute_pygad_experiment(pygad_creator,
         fitness_per_generation.append(-ga_instance.best_solutions_fitness[num_of_generations - 1])
         if i % app_settings.logging_step == 0:
             log_message_info(f"PyGAD - {optimization_name} - Optimization number {i}.")
-            log_message_info(f"PyGAD - {optimization_name} - Average best fitness: {-np.mean(best_fitness_list)}")
+            log_message_info(f"PyGAD - {optimization_name} - Average best fitness: {round(-np.mean(best_fitness_list), 10):.10f}")
             log_message_info(
-                f"PyGAD - {optimization_name} - Average generations completed: {np.mean(generations_completed)}")
-    pygad_avg_fitness = f"PyGAD - {optimization_name} - Final average best fitness: {-np.mean(best_fitness_list)}"
-    pygad_avg_generation_number = f"PyGAD - {optimization_name} - Final average generations completed: {np.mean(generations_completed)}"
-    pygad_avg_fitness_after_n_generations = f"PyGAD - {optimization_name} - Final average fitness after {app_settings.number_of_generations} generations: {np.mean(fitness_per_generation)}"
+                f"PyGAD - {optimization_name} - Average generations completed: {round(np.mean(generations_completed), 10):.10f}")
+    pygad_avg_fitness = f"PyGAD - {optimization_name} - Final average best fitness: {round(-np.mean(best_fitness_list), 10):.10f}"
+    pygad_avg_generation_number = f"PyGAD - {optimization_name} - Final average generations completed: {round(np.mean(generations_completed), 10):.10f}"
+    pygad_avg_fitness_after_n_generations = f"PyGAD - {optimization_name} - Final average fitness after {app_settings.number_of_generations} generations: {round(np.mean(fitness_per_generation), 10):.10f}"
 
     log_message_info(pygad_avg_fitness)
     log_message_info(pygad_avg_generation_number)

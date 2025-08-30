@@ -7,7 +7,7 @@ from functions.rastrigin import rastrigin_func
 def execute_use_case_7_ratrigin_function():
     log_message_info("Ratrigin function - 3 variables")
     experiment = Experiment(rastrigin_func)
-    experiment.fill_args_with_same_values(-5.12, 5.12, 0.1024, 3)
+    experiment.fill_args_with_same_values(-5.12, 5.12, 3, 0.1024)
     experiment.execute_experiment()
 
 def main():

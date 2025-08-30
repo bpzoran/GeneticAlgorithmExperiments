@@ -8,8 +8,12 @@ class ExperimentGASettings:
 
     def __init__(
         self,
-        num_runs: int = 50,
-        logging_step: int = 10,
+        population_size: int = 64,
+        percentage_of_mutation_chromosomes: float = 80.0,
+        percentage_of_mutation_genes: float = 50.0,
+        keep_elitism_percentage: float = 50.0,
+        num_runs: int = 1000,
+        logging_step: int = 50,
         number_of_generations: int = 40,
         plot_fitness: bool = False,
         saturation_criteria: int = 10,
@@ -21,7 +25,23 @@ class ExperimentGASettings:
         # Prevent reinitialization for the singleton
         if getattr(self, "_initialized", False):
             return
-
+        self._population_size_ = None
+        self._percentage_of_mutation_chromosomes_ = None
+        self._percentage_of_mutation_genes_ = None
+        self._keep_elitism_percentage_ = None
+        self._pygad_adaptive_mutation_enabled_ = None
+        self._gadapt_diversity_mutation_enabled_ = None
+        self._pygad_random_mutation_enabled_ = None
+        self._gadapt_random_mutation_enabled_ = None
+        self._saturation_criteria_ = None
+        self._plot_fitness_ = None
+        self._number_of_generations_ = None
+        self._logging_step_ = None
+        self._num_runs_ = None
+        self._population_size = population_size
+        self._percentage_of_mutation_chromosomes = percentage_of_mutation_chromosomes
+        self._percentage_of_mutation_genes = percentage_of_mutation_genes
+        self._keep_elitism_percentage = keep_elitism_percentage
         self._num_runs = num_runs
         self._logging_step = logging_step
         self._number_of_generations = number_of_generations
@@ -32,10 +52,80 @@ class ExperimentGASettings:
         self._pygad_random_mutation_enabled = pygad_random_mutation_enabled
         self._gadapt_diversity_mutation_enabled = gadapt_diversity_mutation_enabled
         self._pygad_adaptive_mutation_enabled = pygad_adaptive_mutation_enabled
+        self.backup_settings()
 
         self._initialized = True
 
-    # --- existing properties ---
+    def backup_settings(self):
+        self._population_size_ = self.population_size
+        self._percentage_of_mutation_chromosomes_ = self.percentage_of_mutation_chromosomes
+        self._percentage_of_mutation_genes_ = self.percentage_of_mutation_genes
+        self._keep_elitism_percentage_ = self.keep_elitism_percentage
+        self._num_runs_ = self.num_runs
+        self._logging_step_ = self.logging_step
+        self._number_of_generations_ = self.number_of_generations
+        self._plot_fitness_ = self.plot_fitness
+        self._saturation_criteria_ = self.saturation_criteria
+
+        self._gadapt_random_mutation_enabled_ = self.gadapt_random_mutation_enabled
+        self._pygad_random_mutation_enabled_ = self.pygad_random_mutation_enabled
+        self._gadapt_diversity_mutation_enabled_ = self.gadapt_diversity_mutation_enabled
+        self._pygad_adaptive_mutation_enabled_ = self.pygad_adaptive_mutation_enabled
+    def restore_settings(self):
+        self.population_size = self._population_size_
+        self.percentage_of_mutation_chromosomes = self._percentage_of_mutation_chromosomes_
+        self.percentage_of_mutation_genes = self._percentage_of_mutation_genes_
+        self.keep_elitism_percentage = self._keep_elitism_percentage_
+        self.num_runs = self._num_runs_
+        self.logging_step = self._logging_step_
+        self.number_of_generations = self._number_of_generations_
+        self.plot_fitness = self._plot_fitness_
+        self.saturation_criteria = self._saturation_criteria_
+
+        self.gadapt_random_mutation_enabled = self._gadapt_random_mutation_enabled_
+        self.pygad_random_mutation_enabled = self._pygad_random_mutation_enabled_
+        self.gadapt_diversity_mutation_enabled = self._gadapt_diversity_mutation_enabled_
+        self.pygad_adaptive_mutation_enabled = self._pygad_adaptive_mutation_enabled_
+
+    @property
+    def population_size(self) -> int:
+        return self._population_size
+
+    @population_size.setter
+    def population_size(self, value: int):
+        if value <= 0:
+            raise ValueError("population_size must be positive")
+        self._population_size = value
+
+    @property
+    def percentage_of_mutation_chromosomes(self) -> float:
+        return self._percentage_of_mutation_chromosomes
+
+    @percentage_of_mutation_chromosomes.setter
+    def percentage_of_mutation_chromosomes(self, value: float):
+        if not (0.0 <= value <= 100.0):
+            raise ValueError("percentage_of_mutation_chromosomes must be between 0 and 100")
+        self._percentage_of_mutation_chromosomes = value
+
+    @property
+    def percentage_of_mutation_genes(self) -> float:
+        return self._percentage_of_mutation_genes
+
+    @percentage_of_mutation_genes.setter
+    def percentage_of_mutation_genes(self, value: float):
+        if not (0.0 <= value <= 100.0):
+            raise ValueError("percentage_of_mutation_genes must be between 0 and 100")
+        self._percentage_of_mutation_genes = value
+
+    @property
+    def keep_elitism_percentage(self) -> float:
+        return self._keep_elitism_percentage
+
+    @keep_elitism_percentage.setter
+    def keep_elitism_percentage(self, value: float):
+        if not (0.0 <= value <= 100.0):
+            raise ValueError("keep_elitism_percentage must be between 0 and 100")
+        self._keep_elitism_percentage = value
 
     @property
     def num_runs(self) -> int:

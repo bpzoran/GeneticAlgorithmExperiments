@@ -34,15 +34,15 @@ def execute_gadapt_experiment(ga,
             final_min_cost = ga_utils.average(cost_values)
             avg_num_of_it = ga_utils.average(iteration_numbers)
             log_message_info(f"GAdapt - {optimization_name} - Optimization number {i}.")
-            log_message_info(f"GAdapt - {optimization_name} - Average best fitness: {final_min_cost}")
-            log_message_info(f"GAdapt - {optimization_name} - Average generations completed: {avg_num_of_it}")
+            log_message_info(f"GAdapt - {optimization_name} - Average best fitness: {round(final_min_cost, 10):.10f}")
+            log_message_info(f"GAdapt - {optimization_name} - Average generations completed: {round(avg_num_of_it, 10):.10f}")
     if is_succ:
         final_min_cost = ga_utils.average(cost_values)
         avg_num_of_it = ga_utils.average(iteration_numbers)
 
-        gadapt_avg_fitness = f"GAdapt - {optimization_name} - Final average best fitness: {final_min_cost}"
-        gadapt_avg_generation_number = f"GAdapt - {optimization_name} - Final average generations completed: {avg_num_of_it}"
-        gadapt_avg_fitness_after_n_generations = f"GAdapt - {optimization_name} - Final average fitness after {app_settings.number_of_generations} generations: {np.mean(fitness_per_generation)}"
+        gadapt_avg_fitness = f"GAdapt - {optimization_name} - Final average best fitness: {round(final_min_cost, 10):.10f}"
+        gadapt_avg_generation_number = f"GAdapt - {optimization_name} - Final average generations completed: {round(avg_num_of_it, 10):.10f}"
+        gadapt_avg_fitness_after_n_generations = f"GAdapt - {optimization_name} - Final average fitness after {app_settings.number_of_generations} generations: {round(np.mean(fitness_per_generation), 10):.10f}"
 
         log_message_info(gadapt_avg_fitness)
         log_message_info(gadapt_avg_generation_number)

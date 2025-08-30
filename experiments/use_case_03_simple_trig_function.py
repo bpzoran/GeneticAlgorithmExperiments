@@ -7,7 +7,7 @@ from functions.simple_trig import simple_trig_func
 from settings.experiment_ga_settings import ExperimentGASettings
 
 
-def execute_use_case_3_simple_trig_function():
+def execute_use_case_03_simple_trig_function():
     log_message_info("Simple trigonometric function")
     args_bounds = [{"low": 0, "high": math.pi, "step": 0.0157},  # arg1
                    {"low": 0, "high": math.pi, "step": 0.0157},  # arg2
@@ -23,7 +23,7 @@ def execute_use_case_3_simple_trig_function():
     experiment.execute_experiment()
 
 def main():
-    run_experiment(execute_use_case_3_simple_trig_function)
+    run_experiment(execute_use_case_03_simple_trig_function)
 
 if __name__ == "__main__":
     main()

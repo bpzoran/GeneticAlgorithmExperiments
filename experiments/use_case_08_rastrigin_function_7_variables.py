@@ -9,7 +9,7 @@ def execute_use_case_8_ratrigin_function():
     log_message_info("Ratrigin function - 7 variables")
     ExperimentGASettings().saturation_criteria = 30
     experiment = Experiment(rastrigin_func)
-    experiment.fill_args_with_same_values(-5.12, 5.12, 0.1024, 7)
+    experiment.fill_args_with_same_values(-5.12, 5.12, 7, 0.1024)
     experiment.execute_experiment()
 
 def main():

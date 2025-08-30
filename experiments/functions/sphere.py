@@ -11,7 +11,5 @@ def sphere_func(x):
     Returns:
         float: Function value
     """
-    if isinstance(x, dict):
-        x = list(x.values())
     x = np.asarray(x)
     return np.sum(x ** 2)
