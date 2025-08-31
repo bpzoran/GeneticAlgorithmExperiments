@@ -1,7 +1,7 @@
 import numpy as np
 
 from utils.exp_logging import log_message_info
-from utils.plot_fitness_per_generation import fitness_per_generation_plot
+from utils.plot_fitness_per_generation import fitness_per_generation_plot, plot_convergence_curve
 from settings.experiment_ga_settings import ExperimentGASettings
 
 log_message_info("Start optimization with PyGad:")
@@ -15,7 +15,7 @@ def execute_pygad_experiment(pygad_creator,
     best_fitness_list = []
     fitness_per_generation = []
     generations_completed = []
-    fitness_values = []
+    min_cost_per_generations_per_run = []
     for i in range(app_settings.num_runs):
         # Create genetic algorithm optimizer
         ga_instance = pygad_creator()
@@ -41,6 +41,7 @@ def execute_pygad_experiment(pygad_creator,
             log_message_info(f"PyGAD - {optimization_name} - Average best fitness: {round(-np.mean(best_fitness_list), 10):.10f}")
             log_message_info(
                 f"PyGAD - {optimization_name} - Average generations completed: {round(np.mean(generations_completed), 10):.10f}")
+        min_cost_per_generations_per_run.append([-fv for fv in fitness_values])
     pygad_avg_fitness = f"PyGAD - {optimization_name} - Final average best fitness: {round(-np.mean(best_fitness_list), 10):.10f}"
     pygad_avg_generation_number = f"PyGAD - {optimization_name} - Final average generations completed: {round(np.mean(generations_completed), 10):.10f}"
     pygad_avg_fitness_after_n_generations = f"PyGAD - {optimization_name} - Final average fitness after {app_settings.number_of_generations} generations: {round(np.mean(fitness_per_generation), 10):.10f}"
@@ -53,5 +54,6 @@ def execute_pygad_experiment(pygad_creator,
     result_list.append(pygad_avg_fitness_after_n_generations)
 
     if app_settings.plot_fitness:
-        f_v = [-fv for fv in fitness_values]
-        fitness_per_generation_plot(f_v, f"PyGad - {optimization_name}", "blue")
+        plot_convergence_curve(min_cost_per_generations_per_run, stat="mean", band="ci", alpha=0.05, n_boot=2000,
+                               color="blue",
+                               title=f"PyGad - {optimization_name}")

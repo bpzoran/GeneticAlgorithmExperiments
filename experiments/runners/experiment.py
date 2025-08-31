@@ -14,12 +14,19 @@ from settings.experiment_ga_settings import ExperimentGASettings
 
 class Experiment:
 
-    def __init__(self, f: Callable, args_bounds: list[dict[str, float]] = None) -> None:
+    def __init__(self, f: Callable, args_bounds: list[dict[str, float]] = None, experiment_name = None) -> None:
         self.f = f
         if args_bounds is None:
             args_bounds = []
         self.args_bounds = args_bounds
         self.app_settings = ExperimentGASettings()
+        if experiment_name is None or experiment_name == "":
+            experiment_name = f.__name__
+        self._experiment_name = experiment_name
+
+    @property
+    def experiment_name(self) -> None:
+        return self._experiment_name + f" ({len(self.args_bounds)} variables)"
 
     def fill_args_with_same_values(self, low: float, high: float,  number_of_args: int, step: Optional[float] = None) -> None:
         bounds = {"low": low, "high": high, **({"step": step} if step is not None else {})}
@@ -63,7 +70,7 @@ class Experiment:
 
 
 
-            execute_pygad_experiment(get_ga_instance, "random mutation", result_list)
+            execute_pygad_experiment(get_ga_instance, f"{self.experiment_name} - random mutation", result_list)
         if self.app_settings.gadapt_random_mutation_enabled:
             ##### GADAPT OPTIMIZATION WITH RANDOM MUTATION ###############
 
@@ -82,7 +89,7 @@ class Experiment:
             # Addition of variables with specified ranges and steps
             self.fill_gadapt_with_args(ga)
 
-            execute_gadapt_experiment(ga, "random mutation",
+            execute_gadapt_experiment(ga, f"{self.experiment_name} - random mutation",
                                       result_list)
         if self.app_settings.gadapt_diversity_mutation_enabled:
             ##### GADAPT OPTIMIZATION WITH DIVERSITY MUTATION ###############
@@ -102,7 +109,7 @@ class Experiment:
             # Addition of variables with specified ranges and steps
             self.fill_gadapt_with_args(ga)
 
-            execute_gadapt_experiment(ga, "diversity mutation", result_list)
+            execute_gadapt_experiment(ga, f"{self.experiment_name} - diversity mutation", result_list)
 
         if self.app_settings.pygad_adaptive_mutation_enabled:
             ##### PYGAD OPTIMIZATION WITH ADAPTIVE MUTATION ###############
@@ -124,7 +131,7 @@ class Experiment:
                                 )
 
 
-            execute_pygad_experiment(get_ga_instance, "adaptive mutation", result_list)
+            execute_pygad_experiment(get_ga_instance, f"{self.experiment_name} - adaptive mutation", result_list)
 
         ######### FINAL RESULTS #############
 

@@ -2,7 +2,7 @@ import numpy as np
 from gadapt.utils import ga_utils
 
 from utils.exp_logging import log_message_info
-from utils.plot_fitness_per_generation import fitness_per_generation_plot
+from utils.plot_fitness_per_generation import fitness_per_generation_plot, plot_convergence_curve
 from settings.experiment_ga_settings import ExperimentGASettings
 
 
@@ -17,13 +17,14 @@ def execute_gadapt_experiment(ga,
     iteration_numbers = []
     fitness_per_generation = []
     is_succ = True
-    min_cost_per_generation = []
+    min_cost_per_generations_per_run = []
     for i in range(app_settings.num_runs):
         results = ga.execute()
         if not results.success:
             is_succ = False
             break
         min_cost_per_generation = results.min_cost_per_generation
+        min_cost_per_generations_per_run.append(min_cost_per_generation)
         cost_values.append(results.min_cost)
         iteration_numbers.append(float(results.number_of_iterations))
         num_of_generations = app_settings.number_of_generations
@@ -51,4 +52,5 @@ def execute_gadapt_experiment(ga,
         result_list.append(gadapt_avg_generation_number)
         result_list.append(gadapt_avg_fitness_after_n_generations)
     if app_settings.plot_fitness:
-        fitness_per_generation_plot(min_cost_per_generation, f"GAdapt - {optimization_name}", "red")
+        plot_convergence_curve(min_cost_per_generations_per_run, stat="mean", band="ci", alpha=0.05, n_boot=2000, color="red",
+                               title=f"GAdapt - {optimization_name}")
