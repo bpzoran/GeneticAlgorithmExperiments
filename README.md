@@ -151,7 +151,8 @@ python use_case_11_beale_function.py plot 20
 This will execute each strategy 20 times and plot the fitness per generation for the final run of each strategy.
 
 All experiments can be run in parallel by executing the following command from the `experiments` folder:
-```python run_all_experiments.py
+```bash
+python run_all_experiments.py
 ```
 
 Number of runs and plotting can be customized in the same way as described above.
