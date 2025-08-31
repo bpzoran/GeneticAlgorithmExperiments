@@ -6,9 +6,9 @@ import pygad
 
 from gadapt.ga import GA
 
-from exp_logging import init_logging, log_message_info
-from gadapt_experiment import execute_gadapt_experiment
-from pygad_experiment import execute_pygad_experiment
+from utils.exp_logging import log_message_info
+from runners.gadapt_experiment import execute_gadapt_experiment
+from runners.pygad_experiment import execute_pygad_experiment
 from settings.experiment_ga_settings import ExperimentGASettings
 
 

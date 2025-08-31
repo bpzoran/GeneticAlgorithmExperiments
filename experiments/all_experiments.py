@@ -10,7 +10,7 @@ import use_case_09_ackley_function_7_variables
 import use_case_10_griewank_function
 import use_case_11_beale_function
 import use_case_12_himmelblau_function
-from experiment_runner import run_experiment
+from runners.experiment_runner import run_experiment
 from settings.experiment_ga_settings import ExperimentGASettings
 
 

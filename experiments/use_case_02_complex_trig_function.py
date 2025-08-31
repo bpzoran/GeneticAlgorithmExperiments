@@ -1,8 +1,6 @@
-import math
-
-from exp_logging import log_message_info
-from experiment import Experiment
-from experiment_runner import run_experiment
+from utils.exp_logging import log_message_info
+from runners.experiment import Experiment
+from runners.experiment_runner import run_experiment
 from functions.complex_trig import complex_trig_func
 
 

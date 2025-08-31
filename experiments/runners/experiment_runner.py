@@ -1,7 +1,7 @@
 import sys
 from typing import Callable
 
-from exp_logging import init_logging
+from utils.exp_logging import init_logging
 from settings.experiment_ga_settings import ExperimentGASettings
 
 def run_experiment(experiment: Callable) -> None:

@@ -1,7 +1,7 @@
 import numpy as np
 
-from exp_logging import log_message_info
-from plot_fitness_per_generation import fitness_per_generation_plot
+from utils.exp_logging import log_message_info
+from utils.plot_fitness_per_generation import fitness_per_generation_plot
 from settings.experiment_ga_settings import ExperimentGASettings
 
 log_message_info("Start optimization with PyGad:")
