@@ -53,4 +53,4 @@ def execute_gadapt_experiment(ga,
         result_list.append(gadapt_avg_fitness_after_n_generations)
     if app_settings.plot_fitness:
         plot_convergence_curve(min_cost_per_generations_per_run, stat="mean", band="ci", alpha=0.05, n_boot=2000, color="red",
-                               title=f"GAdapt - {optimization_name}")
+                               description=f"GAdapt - {optimization_name}")

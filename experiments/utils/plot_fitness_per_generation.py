@@ -94,7 +94,7 @@ def plot_convergence_curve(
     band: str = "ci",              # "ci" for 95% CI, "iqr" for interquartile (25–75%)
     alpha: float = 0.05,
     n_boot: int = 2000,
-    title: str = "GA Convergence (central tendency ± variability)",
+    description: str = "GA Convergence (central tendency ± variability)",
     ylabel: str = "Best (minimal) fitness",
     xlabel: str = "Generation",
     annotate_counts: bool = True,  # annotate how many runs contribute at early/mid/late gens
@@ -118,7 +118,8 @@ def plot_convergence_curve(
     plt.plot(gen, center, label=f"{stat.capitalize()} best fitness")
     plt.fill_between(gen, low, up, alpha=0.2,
                      label=("95% CI" if band == "ci" else "IQR (25–75%)"))
-    plt.xlabel(xlabel); plt.ylabel(ylabel); plt.title(title); plt.legend()
+    plt.xlabel(xlabel); plt.ylabel(ylabel); plt.title(f"GA Convergence (central tendency ± variability)"); plt.legend()
+    plt.figtext(0.5, 0.01, description, ha="center", va="center")
     plt.tight_layout()
     plt.show()
 
@@ -127,6 +128,7 @@ def plot_convergence_curve(
         plt.figure()
         plt.plot(agg["gen"], agg["n_at_gen"], color=color)
         plt.xlabel("Generation"); plt.ylabel("# runs contributing")
-        plt.title("Contributing runs per generation (diagnostic)")
+        plt.title(f"Contributing runs per generation (diagnostic)")
+        plt.figtext(0.5, 0.01, description, ha="center", va="center")
         plt.tight_layout()
         plt.show()

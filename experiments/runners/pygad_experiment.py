@@ -56,4 +56,4 @@ def execute_pygad_experiment(pygad_creator,
     if app_settings.plot_fitness:
         plot_convergence_curve(min_cost_per_generations_per_run, stat="mean", band="ci", alpha=0.05, n_boot=2000,
                                color="blue",
-                               title=f"PyGad - {optimization_name}")
+                               description=f"PyGad - {optimization_name}")
