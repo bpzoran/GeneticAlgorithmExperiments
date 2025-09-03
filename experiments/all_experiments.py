@@ -16,8 +16,6 @@ from settings.experiment_ga_settings import ExperimentGASettings
 
 def run_all_use_cases() -> None:
     app_settings = ExperimentGASettings()
-    app_settings.num_runs = 1000
-    app_settings.logging_step = 1000
     app_settings.backup_settings()
     use_case_01_simple_trigonometric_arithmetic_function.main()
     app_settings.restore_settings()

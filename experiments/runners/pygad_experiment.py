@@ -1,7 +1,8 @@
+from typing import Tuple
+
 import numpy as np
 
 from utils.exp_logging import log_message_info
-from utils.plot_fitness_per_generation import fitness_per_generation_plot, plot_convergence_curve
 from settings.experiment_ga_settings import ExperimentGASettings
 
 log_message_info("Start optimization with PyGad:")
@@ -9,7 +10,7 @@ log_message_info("Start optimization with PyGad:")
 # Define fitness function
 def execute_pygad_experiment(pygad_creator,
                              optimization_name: str = "",
-                             result_list=None):
+                             result_list=None) -> Tuple[list[list[float]], int]:
     log_message_info(f"Start optimization with PyGAD, {optimization_name}:")
     app_settings = ExperimentGASettings()
     best_fitness_list = []
@@ -43,7 +44,8 @@ def execute_pygad_experiment(pygad_creator,
                 f"PyGAD - {optimization_name} - Average generations completed: {round(np.mean(generations_completed), 10):.10f}")
         min_cost_per_generations_per_run.append([-fv for fv in fitness_values])
     pygad_avg_fitness = f"PyGAD - {optimization_name} - Final average best fitness: {round(-np.mean(best_fitness_list), 10):.10f}"
-    pygad_avg_generation_number = f"PyGAD - {optimization_name} - Final average generations completed: {round(np.mean(generations_completed), 10):.10f}"
+    final_average_generations_completed = round(np.mean(generations_completed), 10)
+    pygad_avg_generation_number = f"PyGAD - {optimization_name} - Final average generations completed: {final_average_generations_completed:.10f}"
     pygad_avg_fitness_after_n_generations = f"PyGAD - {optimization_name} - Final average fitness after {app_settings.number_of_generations} generations: {round(np.mean(fitness_per_generation), 10):.10f}"
 
     log_message_info(pygad_avg_fitness)
@@ -53,7 +55,4 @@ def execute_pygad_experiment(pygad_creator,
     result_list.append(pygad_avg_generation_number)
     result_list.append(pygad_avg_fitness_after_n_generations)
 
-    if app_settings.plot_fitness:
-        plot_convergence_curve(min_cost_per_generations_per_run, stat="mean", band="ci", alpha=0.05, n_boot=2000,
-                               color="blue",
-                               description=f"PyGad - {optimization_name}")
+    return min_cost_per_generations_per_run, final_average_generations_completed

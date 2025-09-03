@@ -1,15 +1,19 @@
+import math
 import sys
 from collections.abc import Callable
 from typing import Optional
 
+import numpy as np
 import pygad
 
 from gadapt.ga import GA
 
+from utils.data_aggregation import aggregate_convergence
 from utils.exp_logging import log_message_info
 from runners.gadapt_experiment import execute_gadapt_experiment
 from runners.pygad_experiment import execute_pygad_experiment
 from settings.experiment_ga_settings import ExperimentGASettings
+from utils.plot_fitness_per_generation import plot_convergence_curve
 
 
 class Experiment:
@@ -49,6 +53,8 @@ class Experiment:
 
     def execute_experiment(self):
         result_list = []
+        runs: dict = {}
+        average_generations: dict = {}
         if self.app_settings.pygad_random_mutation_enabled:
             ##### PyGAD OPTIMIZATION WITH RANDOM MUTATION ###############
             # Define min, max values, and steps for each parameter
@@ -68,9 +74,10 @@ class Experiment:
                                 stop_criteria=f"saturate_{self.app_settings.saturation_criteria}"
                                 )
 
-
-
-            execute_pygad_experiment(get_ga_instance, f"{self.experiment_name} - random mutation", result_list)
+            optimization_name = f"{self.experiment_name} - random mutation"
+            min_cost_per_generations_per_run, average_number_of_generations = execute_pygad_experiment(get_ga_instance, optimization_name, result_list)
+            runs[optimization_name] = aggregate_convergence(min_cost_per_generations_per_run, average_number_of_generations)
+            average_generations[optimization_name] = average_number_of_generations
         if self.app_settings.gadapt_random_mutation_enabled:
             ##### GADAPT OPTIMIZATION WITH RANDOM MUTATION ###############
 
@@ -88,9 +95,11 @@ class Experiment:
 
             # Addition of variables with specified ranges and steps
             self.fill_gadapt_with_args(ga)
-
-            execute_gadapt_experiment(ga, f"{self.experiment_name} - random mutation",
+            optimization_name = f"{self.experiment_name} - random mutation"
+            min_cost_per_generations_per_run, average_number_of_generations = execute_gadapt_experiment(ga, optimization_name,
                                       result_list)
+            runs[optimization_name] = aggregate_convergence(min_cost_per_generations_per_run, average_number_of_generations)
+            average_generations[optimization_name] = average_number_of_generations
         if self.app_settings.gadapt_diversity_mutation_enabled:
             ##### GADAPT OPTIMIZATION WITH DIVERSITY MUTATION ###############
 
@@ -108,9 +117,12 @@ class Experiment:
 
             # Addition of variables with specified ranges and steps
             self.fill_gadapt_with_args(ga)
-
-            execute_gadapt_experiment(ga, f"{self.experiment_name} - diversity mutation", result_list)
-
+            optimization_name = f"{self.experiment_name} - diversity mutation"
+            min_cost_per_generations_per_run, average_number_of_generations = execute_gadapt_experiment(ga,
+                                                                                                        optimization_name,
+                                                                                                        result_list)
+            runs[optimization_name] = aggregate_convergence(min_cost_per_generations_per_run, average_number_of_generations)
+            average_generations[optimization_name] = average_number_of_generations
         if self.app_settings.pygad_adaptive_mutation_enabled:
             ##### PYGAD OPTIMIZATION WITH ADAPTIVE MUTATION ###############
 
@@ -130,11 +142,41 @@ class Experiment:
                                 stop_criteria=f"saturate_{self.app_settings.saturation_criteria}"
                                 )
 
-
-            execute_pygad_experiment(get_ga_instance, f"{self.experiment_name} - adaptive mutation", result_list)
-
+            optimization_name = f"{self.experiment_name} - adaptive mutation"
+            min_cost_per_generations_per_run, average_number_of_generations = execute_pygad_experiment(get_ga_instance,
+                                                                                                       optimization_name,
+                                                                                                       result_list)
+            runs[optimization_name] = aggregate_convergence(min_cost_per_generations_per_run, average_number_of_generations)
+            average_generations[optimization_name] = average_number_of_generations
         ######### FINAL RESULTS #############
 
         log_message_info("************Final results:************")
         for r in result_list:
             log_message_info(r)
+        if self.app_settings.plot_fitness:
+            lowest, highest, max_len = analyze_runs(runs)
+            for description in runs:
+                plot_convergence_curve(agg=runs[description],
+                                       x0=average_generations[description],
+                                       lowest=lowest,
+                                       highest=highest,
+                                       max_len=max_len,
+                                       stat="mean",
+                                       band="ci",
+                                       alpha=0.05,
+                                       n_boot=2000,
+                                       color="red",
+                                       description=description)
+
+
+def analyze_runs(runs: dict[str, dict[str, np.ndarray]]):
+    all_uppers = np.concatenate([
+        data["upper"] for data in runs.values() if len(data["upper"]) > 0
+    ])
+    all_lowers = np.concatenate([
+        data["lower"] for data in runs.values() if len(data["lower"]) > 0
+    ])
+    lowest = np.min(all_lowers)
+    highest = np.max(all_uppers)
+    max_len = max(len(data["center"]) for data in runs.values())
+    return lowest, highest, max_len

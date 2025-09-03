@@ -7,7 +7,7 @@ from functions.sphere import sphere_func
 def execute_use_case_4_sphere_function_4_variables():
     log_message_info("Sphere function - 4 variables")
     experiment = Experiment(sphere_func)
-    experiment.fill_args_with_same_values(-5.12, 5.12, 4, 0.01)
+    experiment.fill_args_with_same_values(-5.12, 5.12, 4, 0.1024)
     experiment.execute_experiment()
 
 def main():
