@@ -21,7 +21,8 @@ class ExperimentGASettings:
         pygad_random_mutation_enabled: bool = True,
         gadapt_diversity_mutation_enabled: bool = True,
         pygad_adaptive_mutation_enabled: bool = True,
-        plot_stat = "mean"
+        plot_stat = "mean",
+        plot_band = "ci"
     ):
         # Prevent reinitialization for the singleton
         if getattr(self, "_initialized", False):
@@ -49,6 +50,7 @@ class ExperimentGASettings:
         self._plot_fitness = plot_fitness
         self._saturation_criteria = saturation_criteria
         self._plot_stat = plot_stat
+        self._plot_band = plot_band
 
         self._gadapt_random_mutation_enabled = gadapt_random_mutation_enabled
         self._pygad_random_mutation_enabled = pygad_random_mutation_enabled
@@ -74,6 +76,7 @@ class ExperimentGASettings:
         self._gadapt_diversity_mutation_enabled_ = self.gadapt_diversity_mutation_enabled
         self._pygad_adaptive_mutation_enabled_ = self.pygad_adaptive_mutation_enabled
         self._plot_stat_ = self.plot_stat
+        self._plot_band_ = self.plot_band
     def restore_settings(self):
         self.population_size = self._population_size_
         self.percentage_of_mutation_chromosomes = self._percentage_of_mutation_chromosomes_
@@ -90,6 +93,7 @@ class ExperimentGASettings:
         self.gadapt_diversity_mutation_enabled = self._gadapt_diversity_mutation_enabled_
         self.pygad_adaptive_mutation_enabled = self._pygad_adaptive_mutation_enabled_
         self.plot_stat = self._plot_stat_
+        self.plot_band = self._plot_band_
 
     @property
     def population_size(self) -> int:
@@ -233,6 +237,16 @@ class ExperimentGASettings:
             raise ValueError("plot_stat must be a strean")
         self._plot_stat = value
 
+    @property
+    def plot_band(self) -> str:
+        return self._plot_band
+
+    @plot_band.setter
+    def plot_band(self, value: str):
+        if not isinstance(value, str):
+            raise ValueError("plot_band must be a strean")
+        self._plot_band = value
+
     def __repr__(self):
         return (
             f"ExperimentGASettings("
@@ -250,5 +264,6 @@ class ExperimentGASettings:
             f"gadapt_diversity_mutation_enabled={self.gadapt_diversity_mutation_enabled}, "
             f"pygad_adaptive_mutation_enabled={self.pygad_adaptive_mutation_enabled}, "
             f"plot_stat={self.plot_stat}"
+            f"plot_band={self.plot_band}"
             f")"
         )

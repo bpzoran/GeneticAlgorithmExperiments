@@ -9,8 +9,6 @@ def plot_convergence_curve(
     max_len: float,
     stat: str = "mean",            # "mean" or "median"
     band: str = "ci",              # "ci" for 95% CI, "iqr" for interquartile (25–75%)
-    alpha: float = 0.05,
-    n_boot: int = 2000,
     description: str = "GA Convergence (central tendency ± variability)",
     ylabel: str = "Fitness",
     xlabel: str = "Generation",

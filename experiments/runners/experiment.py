@@ -162,9 +162,7 @@ class Experiment:
                                        highest=highest,
                                        max_len=max_len,
                                        stat=self.app_settings.plot_stat,
-                                       band="ci",
-                                       alpha=0.05,
-                                       n_boot=2000,
+                                       band=self.app_settings.plot_band,
                                        color="red",
                                        description=description)
 
