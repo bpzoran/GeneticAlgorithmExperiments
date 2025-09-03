@@ -235,7 +235,11 @@ class ExperimentGASettings:
 
     def __repr__(self):
         return (
-            "ExperimentGASettings("
+            f"ExperimentGASettings("
+            f"population_size={self.population_size}, "
+            f"percentage_of_mutation_chromosomes={self.percentage_of_mutation_chromosomes}, "
+            f"percentage_of_mutation_genes={self.percentage_of_mutation_genes}, "
+            f"keep_elitism_percentage={self.keep_elitism_percentage}, "
             f"num_runs={self.num_runs}, "
             f"logging_step={self.logging_step}, "
             f"number_of_generations={self.number_of_generations}, "
@@ -244,7 +248,7 @@ class ExperimentGASettings:
             f"gadapt_random_mutation_enabled={self.gadapt_random_mutation_enabled}, "
             f"pygad_random_mutation_enabled={self.pygad_random_mutation_enabled}, "
             f"gadapt_diversity_mutation_enabled={self.gadapt_diversity_mutation_enabled}, "
-            f"pygad_adaptive_mutation_enabled={self.pygad_adaptive_mutation_enabled}"
+            f"pygad_adaptive_mutation_enabled={self.pygad_adaptive_mutation_enabled}, "
             f"plot_stat={self.plot_stat}"
-            ")"
+            f")"
         )
