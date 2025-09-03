@@ -31,7 +31,6 @@ def _bootstrap_ci(
 # -------- Aggregate per generation across runs --------------------------------
 def aggregate_convergence(
     runs: List[List[float]],
-    avg_number_of_generations: int,
     stat: str = "mean",                # "mean" or "median"
     band: str = "ci",                  # "ci" for bootstrap CI, or "iqr" for 25-75%
     alpha: float = 0.05,               # for CI

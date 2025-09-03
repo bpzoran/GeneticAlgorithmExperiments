@@ -21,6 +21,7 @@ class ExperimentGASettings:
         pygad_random_mutation_enabled: bool = True,
         gadapt_diversity_mutation_enabled: bool = True,
         pygad_adaptive_mutation_enabled: bool = True,
+        plot_stat = "mean"
     ):
         # Prevent reinitialization for the singleton
         if getattr(self, "_initialized", False):
@@ -47,6 +48,7 @@ class ExperimentGASettings:
         self._number_of_generations = number_of_generations
         self._plot_fitness = plot_fitness
         self._saturation_criteria = saturation_criteria
+        self._plot_stat = plot_stat
 
         self._gadapt_random_mutation_enabled = gadapt_random_mutation_enabled
         self._pygad_random_mutation_enabled = pygad_random_mutation_enabled
@@ -71,6 +73,7 @@ class ExperimentGASettings:
         self._pygad_random_mutation_enabled_ = self.pygad_random_mutation_enabled
         self._gadapt_diversity_mutation_enabled_ = self.gadapt_diversity_mutation_enabled
         self._pygad_adaptive_mutation_enabled_ = self.pygad_adaptive_mutation_enabled
+        self._plot_stat_ = self.plot_stat
     def restore_settings(self):
         self.population_size = self._population_size_
         self.percentage_of_mutation_chromosomes = self._percentage_of_mutation_chromosomes_
@@ -86,6 +89,7 @@ class ExperimentGASettings:
         self.pygad_random_mutation_enabled = self._pygad_random_mutation_enabled_
         self.gadapt_diversity_mutation_enabled = self._gadapt_diversity_mutation_enabled_
         self.pygad_adaptive_mutation_enabled = self._pygad_adaptive_mutation_enabled_
+        self.plot_stat = self._plot_stat_
 
     @property
     def population_size(self) -> int:
@@ -219,6 +223,16 @@ class ExperimentGASettings:
             raise ValueError("pygad_adaptive_mutation_enabled must be a boolean")
         self._pygad_adaptive_mutation_enabled = value
 
+    @property
+    def plot_stat(self) -> str:
+        return self._plot_stat
+
+    @plot_stat.setter
+    def plot_stat(self, value: str):
+        if not isinstance(value, str):
+            raise ValueError("plot_stat must be a strean")
+        self._plot_stat = value
+
     def __repr__(self):
         return (
             "ExperimentGASettings("
@@ -231,5 +245,6 @@ class ExperimentGASettings:
             f"pygad_random_mutation_enabled={self.pygad_random_mutation_enabled}, "
             f"gadapt_diversity_mutation_enabled={self.gadapt_diversity_mutation_enabled}, "
             f"pygad_adaptive_mutation_enabled={self.pygad_adaptive_mutation_enabled}"
+            f"plot_stat={self.plot_stat}"
             ")"
         )
