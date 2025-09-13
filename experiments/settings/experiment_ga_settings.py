@@ -12,21 +12,28 @@ class ExperimentGASettings:
         percentage_of_mutation_chromosomes: float = 80.0,
         percentage_of_mutation_genes: float = 50.0,
         keep_elitism_percentage: float = 50.0,
-        num_runs: int = 1000,
+        num_runs: int = 10,
         logging_step: int = 50,
         number_of_generations: int = 40,
-        plot_fitness: bool = False,
+        plot_fitness: bool = True,
         saturation_criteria: int = 10,
         gadapt_random_mutation_enabled: bool = False,
         pygad_random_mutation_enabled: bool = True,
         gadapt_diversity_mutation_enabled: bool = True,
         pygad_adaptive_mutation_enabled: bool = True,
         plot_stat = "mean",
-        plot_band = "ci"
+        plot_band = "ci",
+            variable_numbers=None,
+            saturation_criterias=None,
     ):
         # Prevent reinitialization for the singleton
         if getattr(self, "_initialized", False):
             return
+        if variable_numbers is None:
+            variable_numbers = [2, 3, 4, 5, 6, 7, 8, 9, 10]
+        if saturation_criterias is None:
+            saturation_criterias = [10, 20, 30]
+
         self._population_size_ = None
         self._percentage_of_mutation_chromosomes_ = None
         self._percentage_of_mutation_genes_ = None
@@ -56,6 +63,8 @@ class ExperimentGASettings:
         self._pygad_random_mutation_enabled = pygad_random_mutation_enabled
         self._gadapt_diversity_mutation_enabled = gadapt_diversity_mutation_enabled
         self._pygad_adaptive_mutation_enabled = pygad_adaptive_mutation_enabled
+        self._variable_numbers = variable_numbers
+        self._saturation_criterias = saturation_criterias
         self.backup_settings()
 
         self._initialized = True
@@ -77,6 +86,8 @@ class ExperimentGASettings:
         self._pygad_adaptive_mutation_enabled_ = self.pygad_adaptive_mutation_enabled
         self._plot_stat_ = self.plot_stat
         self._plot_band_ = self.plot_band
+        self._variable_numbers_ = self._variable_numbers
+        self._saturation_criterias_ = self._saturation_criterias
     def restore_settings(self):
         self.population_size = self._population_size_
         self.percentage_of_mutation_chromosomes = self._percentage_of_mutation_chromosomes_
@@ -94,6 +105,8 @@ class ExperimentGASettings:
         self.pygad_adaptive_mutation_enabled = self._pygad_adaptive_mutation_enabled_
         self.plot_stat = self._plot_stat_
         self.plot_band = self._plot_band_
+        self.variable_numbers = self._variable_numbers_
+        self.saturation_criterias = self._saturation_criterias_
 
     @property
     def population_size(self) -> int:
@@ -234,17 +247,37 @@ class ExperimentGASettings:
     @plot_stat.setter
     def plot_stat(self, value: str):
         if not isinstance(value, str):
-            raise ValueError("plot_stat must be a strean")
+            raise ValueError("plot_stat must be a string")
         self._plot_stat = value
 
     @property
     def plot_band(self) -> str:
         return self._plot_band
 
+    @property
+    def variable_numbers(self) -> list[int]:
+        return self._variable_numbers
+
+    @variable_numbers.setter
+    def variable_numbers(self, value: list[int]):
+        if not isinstance(value, list):
+            raise ValueError("variable_numbers must be a list")
+        self._variable_numbers = value
+
+    @property
+    def saturation_criterias(self) -> list[int]:
+        return self._saturation_criterias
+
+    @saturation_criterias.setter
+    def saturation_criterias(self, value: list[int]):
+        if not isinstance(value, list):
+            raise ValueError("saturation_criterias must be a list")
+        self._saturation_criterias = value
+
     @plot_band.setter
     def plot_band(self, value: str):
         if not isinstance(value, str):
-            raise ValueError("plot_band must be a strean")
+            raise ValueError("plot_band must be a string")
         self._plot_band = value
 
     def __repr__(self):
@@ -265,5 +298,7 @@ class ExperimentGASettings:
             f"pygad_adaptive_mutation_enabled={self.pygad_adaptive_mutation_enabled}, "
             f"plot_stat={self.plot_stat}"
             f"plot_band={self.plot_band}"
+            f"variable_numbers={self.variable_numbers}"
+            f"saturation_criterias={self.saturation_criterias}"
             f")"
         )

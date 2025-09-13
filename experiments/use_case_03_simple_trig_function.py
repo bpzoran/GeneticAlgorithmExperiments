@@ -1,13 +1,17 @@
 import math
 
+from settings.experiment_ga_settings import ExperimentGASettings
 from utils.exp_logging import log_message_info
 from runners.experiment import Experiment
 from runners.experiment_runner import run_experiment
 from functions.simple_trig import simple_trig_func
 
+saturation_criterias = [10, 30]
 
-def execute_use_case_03_simple_trig_function():
+def execute():
     log_message_info("Simple trigonometric function")
+    app_settings = ExperimentGASettings()
+    app_settings.saturation_criterias = list(set(app_settings.saturation_criterias) & set(saturation_criterias))
     args_bounds = [{"low": 0, "high": math.pi, "step": 0.0157},  # arg1
                    {"low": 0, "high": math.pi, "step": 0.0157},  # arg2
                    {"low": 0, "high": 200, "step": 1},  # arg3
@@ -22,7 +26,7 @@ def execute_use_case_03_simple_trig_function():
     experiment.execute_experiment()
 
 def main():
-    run_experiment(execute_use_case_03_simple_trig_function)
+    run_experiment(execute)
 
 if __name__ == "__main__":
     main()

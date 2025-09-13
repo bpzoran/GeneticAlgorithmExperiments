@@ -4,17 +4,20 @@ from runners.experiment import Experiment
 from runners.experiment_runner import run_experiment
 from functions.ackley import ackley_func
 
-
-def execute_use_case_9_ackley_function():
-    log_message_info("Ackley function - 7 variables")
+variable_numbers = [2, 7]
+saturation_criterias = [10, 30]
+def execute():
+    log_message_info("Ackley function")
+    app_settings = ExperimentGASettings()
+    app_settings.saturation_criterias = list(set(app_settings.saturation_criterias) & set(saturation_criterias))
     experiment = Experiment(ackley_func)
     app_settings = ExperimentGASettings()
     app_settings.saturation_criteria = 30
-    experiment.fill_args_with_same_values(-4, 4, 7, 0.08)
+    experiment.fill_args_with_same_values(-4, 4, variable_numbers, 0.08)
     experiment.execute_experiment()
 
 def main():
-    run_experiment(execute_use_case_9_ackley_function)
+    run_experiment(execute)
 
 if __name__ == "__main__":
     main()

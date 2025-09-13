@@ -4,17 +4,18 @@ from runners.experiment import Experiment
 from runners.experiment_runner import run_experiment
 from functions.rosenbrock import rosenbrock_func
 
-
-def execute_use_case_6_rosenbrock_function_7_variables():
-    log_message_info("Rosenbrock function - 7 variables")
+variable_numbers = [3, 7]
+saturation_criterias = [10, 30]
+def execute():
+    log_message_info("Rosenbrock function")
     app_settings = ExperimentGASettings()
-    app_settings.saturation_criteria = 30
+    app_settings.saturation_criterias = list(set(app_settings.saturation_criterias) & set(saturation_criterias))
     experiment = Experiment(rosenbrock_func)
-    experiment.fill_args_with_same_values(0.5, 1.5, 7, 0.01)
+    experiment.fill_args_with_same_values(0.5, 1.5, variable_numbers, 0.01)
     experiment.execute_experiment()
 
 def main():
-    run_experiment(execute_use_case_6_rosenbrock_function_7_variables)
+    run_experiment(execute)
 
 if __name__ == "__main__":
     main()

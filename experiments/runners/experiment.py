@@ -19,6 +19,9 @@ from utils.plot_fitness_per_generation import plot_convergence_curve
 class Experiment:
 
     def __init__(self, f: Callable, args_bounds: list[dict[str, float]] = None, experiment_name = None) -> None:
+        self._args_bounds = None
+        self.args_bounds_list = []
+        self._arg_bounds = None
         self.f = f
         if args_bounds is None:
             args_bounds = []
@@ -29,16 +32,36 @@ class Experiment:
         self._experiment_name = experiment_name
 
     @property
-    def experiment_name(self) -> None:
-        return self._experiment_name + f" ({len(self.args_bounds)} variables)"
+    def experiment_name(self) -> str:
+        return self._experiment_name + f" ({len(self._args_bounds)} variables, saturation = {self.app_settings.saturation_criteria})"
 
-    def fill_args_with_same_values(self, low: float, high: float,  number_of_args: int, step: Optional[float] = None) -> None:
-        bounds = {"low": low, "high": high, **({"step": step} if step is not None else {})}
-        self.args_bounds = [bounds.copy() for _ in range(number_of_args)]
+    @property
+    def args_bounds(self) -> list:
+        return self._arg_bounds
+
+    @args_bounds.setter
+    def args_bounds(self, value: list):
+        self.args_bounds_list = []
+        if value not in self.args_bounds_list:
+            self.args_bounds_list.append(value)
+
+    def fill_args_with_same_values(self, low: float, high: float,  number_of_args: int | list[int], step: Optional[float] = None) -> None:
+        if isinstance(number_of_args, int):
+            bounds = {"low": low, "high": high, **({"step": step} if step is not None else {})}
+            self.args_bounds = [bounds.copy() for _ in range(number_of_args)]
+        elif isinstance(number_of_args, list):
+            number_of_args = list(set(number_of_args) & set(self.app_settings.variable_numbers))
+            if len(number_of_args) == 0:
+                return
+            self.args_bounds_list = []
+            for num_of_args in number_of_args:
+                bounds = {"low": low, "high": high, **({"step": step} if step is not None else {})}
+                arg_bounds = [bounds.copy() for _ in range(num_of_args)]
+                self.args_bounds_list.append(arg_bounds)
 
 
     def fill_gadapt_with_args(self, ga: GA) -> None:
-        for ab in self.args_bounds:
+        for ab in self._args_bounds:
             step = ab.get("step")
             if step is None:
                 step = sys.float_info.min
@@ -52,6 +75,15 @@ class Experiment:
         return 0 - self.f(solution)
 
     def execute_experiment(self):
+        for args_bounds in self.args_bounds_list:
+            self._args_bounds = args_bounds
+            for saturation_criteria in self.app_settings.saturation_criterias:
+                self.app_settings.saturation_criteria = saturation_criteria
+                log_message_info(f"Executing experiment: {self.experiment_name} with args bounds: {args_bounds} and saturation criteria: {saturation_criteria}")
+                self._execute_single_experiment()
+
+
+    def _execute_single_experiment(self):
         result_list = []
         runs: dict = {}
         average_generations: dict = {}
@@ -63,9 +95,9 @@ class Experiment:
                                 num_parents_mating=round((self.app_settings.keep_elitism_percentage / 100) * self.app_settings.population_size),
                                 parent_selection_type="sss",
                                 sol_per_pop=self.app_settings.population_size,
-                                num_genes=len(self.args_bounds),
+                                num_genes=len(self._args_bounds),
                                 gene_type=float,
-                                gene_space=self.args_bounds,
+                                gene_space=self._args_bounds,
                                 fitness_func=self.fitness_func,
                                 mutation_percent_genes=self.app_settings.percentage_of_mutation_genes,
                                 mutation_type="random",
@@ -73,12 +105,12 @@ class Experiment:
                                 keep_elitism=round((self.app_settings.keep_elitism_percentage / 100) * self.app_settings.population_size),
                                 stop_criteria=f"saturate_{self.app_settings.saturation_criteria}"
                                 )
-
-            optimization_name = f"{self.experiment_name} - random mutation"
+            mutation_type = "random mutation"
+            optimization_name = f"{self.experiment_name} - {mutation_type}"
             min_cost_per_generations_per_run, average_number_of_generations = execute_pygad_experiment(get_ga_instance, optimization_name, result_list)
-            runs[optimization_name] = aggregate_convergence(min_cost_per_generations_per_run, stat=self.app_settings.plot_stat, band=self.app_settings.plot_band)
-            average_generations[optimization_name] = average_number_of_generations
-            average_generations[optimization_name] = average_number_of_generations
+            runs[mutation_type] = aggregate_convergence(min_cost_per_generations_per_run, stat=self.app_settings.plot_stat, band=self.app_settings.plot_band)
+            average_generations[mutation_type] = average_number_of_generations
+            average_generations[mutation_type] = average_number_of_generations
         if self.app_settings.gadapt_random_mutation_enabled:
             ##### GADAPT OPTIMIZATION WITH RANDOM MUTATION ###############
 
@@ -96,11 +128,12 @@ class Experiment:
 
             # Addition of variables with specified ranges and steps
             self.fill_gadapt_with_args(ga)
-            optimization_name = f"{self.experiment_name} - random mutation"
+            mutation_type = "random mutation"
+            optimization_name = f"{self.experiment_name} - {mutation_type}"
             min_cost_per_generations_per_run, average_number_of_generations = execute_gadapt_experiment(ga, optimization_name,
                                       result_list)
-            runs[optimization_name] = aggregate_convergence(min_cost_per_generations_per_run, stat=self.app_settings.plot_stat, band=self.app_settings.plot_band)
-            average_generations[optimization_name] = average_number_of_generations
+            runs[mutation_type] = aggregate_convergence(min_cost_per_generations_per_run, stat=self.app_settings.plot_stat, band=self.app_settings.plot_band)
+            average_generations[mutation_type] = average_number_of_generations
         if self.app_settings.gadapt_diversity_mutation_enabled:
             ##### GADAPT OPTIMIZATION WITH DIVERSITY MUTATION ###############
 
@@ -118,12 +151,13 @@ class Experiment:
 
             # Addition of variables with specified ranges and steps
             self.fill_gadapt_with_args(ga)
-            optimization_name = f"{self.experiment_name} - diversity mutation"
+            mutation_type = "diversity mutation"
+            optimization_name = f"{self.experiment_name} - {mutation_type}"
             min_cost_per_generations_per_run, average_number_of_generations = execute_gadapt_experiment(ga,
                                                                                                         optimization_name,
                                                                                                         result_list)
-            runs[optimization_name] = aggregate_convergence(min_cost_per_generations_per_run, stat=self.app_settings.plot_stat, band=self.app_settings.plot_band)
-            average_generations[optimization_name] = average_number_of_generations
+            runs[mutation_type] = aggregate_convergence(min_cost_per_generations_per_run, stat=self.app_settings.plot_stat, band=self.app_settings.plot_band)
+            average_generations[mutation_type] = average_number_of_generations
         if self.app_settings.pygad_adaptive_mutation_enabled:
             ##### PYGAD OPTIMIZATION WITH ADAPTIVE MUTATION ###############
 
@@ -132,9 +166,9 @@ class Experiment:
                                 num_parents_mating=round((self.app_settings.keep_elitism_percentage / 100) * self.app_settings.population_size),
                                 parent_selection_type="sss",
                                 sol_per_pop=self.app_settings.population_size,
-                                num_genes=len(self.args_bounds),
+                                num_genes=len(self._args_bounds),
                                 gene_type=float,
-                                gene_space=self.args_bounds,
+                                gene_space=self._args_bounds,
                                 fitness_func=self.fitness_func,
                                 mutation_percent_genes=[60, 40],
                                 mutation_type="adaptive",
@@ -143,12 +177,13 @@ class Experiment:
                                 stop_criteria=f"saturate_{self.app_settings.saturation_criteria}"
                                 )
 
-            optimization_name = f"{self.experiment_name} - adaptive mutation"
+            mutation_type = "adaptive mutation"
+            optimization_name = f"{self.experiment_name} - {mutation_type}"
             min_cost_per_generations_per_run, average_number_of_generations = execute_pygad_experiment(get_ga_instance,
                                                                                                        optimization_name,
                                                                                                        result_list)
-            runs[optimization_name] = aggregate_convergence(min_cost_per_generations_per_run, stat=self.app_settings.plot_stat, band=self.app_settings.plot_band)
-            average_generations[optimization_name] = average_number_of_generations
+            runs[mutation_type] = aggregate_convergence(min_cost_per_generations_per_run, stat=self.app_settings.plot_stat, band=self.app_settings.plot_band)
+            average_generations[mutation_type] = average_number_of_generations
         ######### FINAL RESULTS #############
 
         log_message_info("************Final results:************")
@@ -156,16 +191,14 @@ class Experiment:
             log_message_info(r)
         if self.app_settings.plot_fitness:
             lowest, highest, max_len = analyze_runs(runs)
-            for description in runs:
-                plot_convergence_curve(agg=runs[description],
-                                       x0=average_generations[description],
-                                       lowest=lowest,
-                                       highest=highest,
-                                       max_len=max_len,
-                                       stat=self.app_settings.plot_stat,
-                                       band=self.app_settings.plot_band,
-                                       color="red",
-                                       description=description)
+            plot_convergence_curve(agg=runs,
+                                   x0=average_generations,
+                                   lowest=lowest,
+                                   highest=highest,
+                                   max_len=max_len,
+                                   stat=self.app_settings.plot_stat,
+                                   band=self.app_settings.plot_band,
+                                   description=self.experiment_name)
 
 
 def analyze_runs(runs: dict[str, dict[str, np.ndarray]]):

@@ -3,7 +3,7 @@ import numpy as np
 
 def plot_convergence_curve(
     agg,
-    x0: float,
+    x0,
     lowest: float,
     highest: float,
     max_len: float,
@@ -12,126 +12,154 @@ def plot_convergence_curve(
     description: str = "GA Convergence (central tendency ± variability)",
     ylabel: str = "Fitness",
     xlabel: str = "Generation",
-    annotate_counts: bool = True,  # (kept for compatibility)
-    color: str = "C0",             # (kept for compatibility)
-    color_left: str = "tab:blue",
-    color_right: str = "tab:orange",
-    vline_caption: str | None = None,
+    annotate_counts: bool = True,  # plot diagnostic figure with #runs per generation
     vline_kw: dict | None = None,
     text_kw: dict | None = None,
 ):
-    gen = np.asarray(agg["gen"], dtype=float)
-    center = np.asarray(agg["center"], dtype=float)
-    low = np.asarray(agg["lower"], dtype=float)
-    up = np.asarray(agg["upper"], dtype=float)
+    """
+    agg:
+      - single: {"gen","center","lower","upper"}
+      - multi:  {label: {"gen","center","lower","upper","n_at_gen"(opt)}}
+    x0:
+      - single: float
+      - multi:  {label: float}
+    """
+    description = transform_function_string(description)
+    # Normalize to multi-series dict: label -> series_dict
+    is_single = isinstance(agg, dict) and {"gen", "center", "lower", "upper"} <= set(agg.keys())
+    if is_single:
+        series_dict = {"Series": agg}
+        x0_map = {"Series": float(x0)}
+    else:
+        if not isinstance(x0, dict):
+            raise TypeError("When agg contains multiple series, x0 must be a dict keyed like agg.")
+        series_dict = agg
+        x0_map = {k: float(v) for k, v in x0.items()}
 
-    # Ensure increasing x for interpolation safety
-    order = np.argsort(gen)
-    gen, center, low, up = gen[order], center[order], low[order], up[order]
-
-    # Trim NaNs from both ends based on center
-    valid = ~np.isnan(center)
-    if not valid.any():
-        raise ValueError("All aggregated values are NaN. Check your `runs` input.")
-    first, last = np.argmax(valid), len(valid) - np.argmax(valid[::-1]) - 1
-    gen, center, low, up = gen[first:last+1], center[first:last+1], low[first:last+1], up[first:last+1]
-
-    if not (gen.min() <= x0 <= gen.max()):
-        raise ValueError(f"x0={x0} is outside the generation range [{gen.min()}, {gen.max()}].")
-
-    # Interpolate y at the split so colored segments meet cleanly
-    y0 = float(np.interp(x0, gen, center))
-
-    #start
+    # --- Figure with a caption row ---
     fig = plt.figure(constrained_layout=True)
     gs = fig.add_gridspec(2, 1, height_ratios=[12, 1])
-
-    ax = fig.add_subplot(gs[0, 0])  # main plot as before
+    ax = fig.add_subplot(gs[0, 0])
     ax.xaxis.labelpad = 6
-    cap_ax = fig.add_subplot(gs[1, 0])  # caption row
+    cap_ax = fig.add_subplot(gs[1, 0])
     cap_ax.axis('off')
     cap_ax.text(0.5, 0.5, description, ha='center', va='center', wrap=True)
 
-    # Variability band (single color over full domain)
-    ax.fill_between(gen, low, up, alpha=0.2,
-                    label=("95% CI" if band == "ci" else "IQR (25–75%)"))
-
-    # Split central tendency line into two colored segments
-    left_mask = gen <= x0
-    right_mask = gen >= x0
-
-    x_left = np.r_[gen[left_mask], x0]
-    y_left = np.r_[center[left_mask], y0]
-    x_right = np.r_[x0, gen[right_mask]]
-    y_right = np.r_[y0, center[right_mask]]
-
-    line_left, = ax.plot(x_left, y_left, color=color_left, lw=2,
-                         label=f"{stat.capitalize()} fitness (generations ≤ {round(x0):g})")
-    line_right, = ax.plot(x_right, y_right, color=color_right, lw=2,
-                          label=f"{stat.capitalize()} fitness (generations ≥ {round(x0):g})")
-
-    # Limits and labels
-    ax.set_xlim(0 - round(max_len / 20), max_len)
-    lowest = lowest - ((highest - lowest) / 20)   # small bottom margin
-    ax.set_ylim(lowest, highest)
+    # Global limits
+    xpad_left = round(max_len / 20)
+    ypad_bottom = (highest - lowest) / 20
+    ax.set_xlim(0 - xpad_left, max_len)
+    ax.set_ylim(lowest - ypad_bottom, highest)
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
     ax.set_title("GA Convergence (central tendency ± variability)")
 
-    # Vertical line from curve at x0 down to the x-axis (bottom of current y-limits)
+    # Common styles
     vk = dict(linestyle='--', linewidth=1.5, color='0.35')
     if vline_kw: vk.update(vline_kw)
-    y_bottom = ax.get_ylim()[0]
-    ax.vlines(x0, y_bottom, y0, **vk)
-
-    # Caption next to the vertical line
-    if vline_caption is None:
-        vline_caption = f"Avg\ngenerations = {round(x0):g}"
     tk = dict(ha='left', va='center')
     if text_kw: tk.update(text_kw)
-    # If x0 is near the right edge, place caption to the left
-    place_left = x0 > (gen.min() + 0.8 * (gen.max() - gen.min()))
-    dx = -6 if place_left else 6
-    y_mid = 0.5 * (y0 + y_bottom)
-    ax.annotate(vline_caption, xy=(x0, y_mid), xytext=(dx, 0),
-                textcoords='offset points', **tk)
+
+    # Plot all series; store colors and x0 for stacked annotations later
+    colors_by_label: dict[str, str] = {}
+    vline_info: list[tuple[str, float, str]] = []  # (label, x0_val, color)
+
+    for label, s in series_dict.items():
+        gen = np.asarray(s["gen"], dtype=float)
+        center = np.asarray(s["center"], dtype=float)
+        low = np.asarray(s["lower"], dtype=float)
+        up = np.asarray(s["upper"], dtype=float)
+
+        # sort by gen and trim NaNs
+        order = np.argsort(gen)
+        gen, center, low, up = gen[order], center[order], low[order], up[order]
+        valid = ~np.isnan(center)
+        if not valid.any():
+            continue
+        first = np.argmax(valid)
+        last = len(valid) - np.argmax(valid[::-1]) - 1
+        gen, center, low, up = gen[first:last+1], center[first:last+1], low[first:last+1], up[first:last+1]
+
+        # band & line
+        ax.fill_between(gen, low, up, alpha=0.15, label="_nolegend_")
+        line, = ax.plot(gen, center, lw=2, label=label)
+        line_color = line.get_color()
+        colors_by_label[label] = line_color
+
+        # vline in same color
+        if label in x0_map:
+            x0_val = x0_map[label]
+            if gen.min() <= x0_val <= gen.max():
+                ax.axvline(x0_val, **{**vk, "color": line_color})
+                vline_info.append((label, x0_val, line_color))
 
     ax.legend()
 
+    # ---- Stack "Avg gen =" annotations so they don't overlap ----
+    if vline_info:
+        # Sort by x0 so stacking is deterministic (left -> right)
+        vline_info.sort(key=lambda t: t[1])
+
+        y_min, y_max = ax.get_ylim()
+        y_range = y_max - y_min
+
+        top_anchor_frac = 0.95         # start near the top
+        stack_band_frac = 0.25         # use top 25% of the plot for stacking
+        n = len(vline_info)
+        dy_frac = stack_band_frac / max(n, 1)  # vertical step in fraction of y-range
+
+        for i, (label, x0_val, color) in enumerate(vline_info):
+            # place labels one under another within the top band
+            y_text = y_min + (top_anchor_frac - i * dy_frac) * y_range
+
+            # place left of the line if too close to right edge
+            x_min, x_max = ax.get_xlim()
+            place_left = x0_val > (x_min + 0.85 * (x_max - x_min))
+            dx = -6 if place_left else 6
+
+            ax.annotate(f"Avg gen = {round(x0_val):g}",
+                        xy=(x0_val, y_text), xytext=(dx, 0),
+                        textcoords='offset points',
+                        color=color, ha='left', va='center')
+
+    # --- Diagnostic plot: #runs per generation for all series ---
     if annotate_counts:
         fig2, ax2 = plt.subplots()
-        ax2.plot(agg["gen"], agg["n_at_gen"], color=color)
-        ax2.set_xlim(0 - round(max_len / 20), max_len)
+        ax2.set_xlim(0 - xpad_left, max_len)
         ax2.set_xlabel("Generation")
         ax2.set_ylabel("# runs contributing")
         ax2.set_title("Contributing runs per generation")
 
-        # Vertical line at x0
-        try:
-            ax2.axvline(x0, **vk)  # reuse main plot style
-        except NameError:
-            ax2.axvline(x0, linestyle='--', linewidth=1.5, color='0.35')
+        for label, s in series_dict.items():
+            gen = np.asarray(s["gen"], dtype=float)
+            n_at_gen = np.asarray(s["n_at_gen"], dtype=float) if "n_at_gen" in s else None
+            if n_at_gen is None:
+                continue
+            order = np.argsort(gen)
+            gen, n_at_gen = gen[order], n_at_gen[order]
+            line2, = ax2.plot(gen, n_at_gen, label=label)
+            c = colors_by_label.get(label, line2.get_color())
 
-        # --- Text "Average generations = {x0}" beside the vline ---
-        gen_arr = np.asarray(agg["gen"], dtype=float)
-        n_arr = np.asarray(agg["n_at_gen"], dtype=float)
-        order = np.argsort(gen_arr)
-        gen_arr, n_arr = gen_arr[order], n_arr[order]
-        y_at_x0 = float(np.interp(x0, gen_arr, n_arr))  # count at x0 (interp)
+            # vline + stacked annotation on diagnostic too (optional: same order)
+            if label in x0_map:
+                x0_val = x0_map[label]
+                ax2.axvline(x0_val, **{**vk, "color": c})
 
-        y_min, y_max = ax2.get_ylim()
-        y_text = 0.5 * (y_at_x0 + y_min)  # place halfway to baseline
-
-        place_left = x0 > (gen_arr.min() + 0.8 * (gen_arr.max() - gen_arr.min()))
-        dx = -6 if place_left else 6
-
-        ax2.annotate(f"Avg\ngenerations = {round(x0):g}",
-                     xy=(x0, y_text), xytext=(dx, 0),
-                     textcoords='offset points', ha='left', va='center')
-
-        # Caption under the plot
+        ax2.legend()
         fig2.subplots_adjust(bottom=0.22)
         fig2.text(0.5, 0.04, description, ha="center", va="bottom", wrap=True)
-
         plt.show()
 
+    plt.show()
+
+def transform_function_string(text: str) -> str:
+    words = text.split()
+    new_words = []
+    for word in words:
+        if "_func" in word:
+            word = word.replace("func", "Function")
+        new_words.append(word)
+    # replace underscores with spaces
+    result = " ".join(new_words).replace("_", " ")
+    # capitalize every word
+    return result.title()
