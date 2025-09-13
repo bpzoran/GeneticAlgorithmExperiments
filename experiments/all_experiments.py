@@ -51,7 +51,7 @@ def _get_main(mod) -> Optional[Callable[[], None]]:
 def run_all_use_cases() -> None:
     # must start exactly like this:
     app_settings = ExperimentGASettings()
-    app_settings.num_runs = 10
+    app_settings.num_runs = 1000
     app_settings.plot_fitness = True
     app_settings.backup_settings()
 
