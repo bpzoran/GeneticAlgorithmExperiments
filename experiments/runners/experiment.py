@@ -8,6 +8,7 @@ import pygad
 
 from gadapt.ga import GA
 
+from plugins.pygad.pygad_blending_crossover import blend_crossover_pygad
 from utils.data_aggregation import aggregate_convergence
 from utils.exp_logging import log_message_info
 from runners.gadapt_experiment import execute_gadapt_experiment
@@ -103,7 +104,8 @@ class Experiment:
                                 mutation_type="random",
                                 suppress_warnings=True,
                                 keep_elitism=round((self.app_settings.keep_elitism_percentage / 100) * self.app_settings.population_size),
-                                stop_criteria=f"saturate_{self.app_settings.saturation_criteria}"
+                                stop_criteria=f"saturate_{self.app_settings.saturation_criteria}",
+                                crossover_type=blend_crossover_pygad
                                 )
             mutation_type = "random mutation"
             optimization_name = f"{self.experiment_name} - {mutation_type}"
@@ -124,6 +126,7 @@ class Experiment:
                     exit_check="min_cost",
                     keep_elitism_percentage=self.app_settings.keep_elitism_percentage,
                     max_attempt_no=self.app_settings.saturation_criteria,
+                    parent_selection="from_top_to_bottom",
                     logging=False)
 
             # Addition of variables with specified ranges and steps
@@ -147,6 +150,7 @@ class Experiment:
                     exit_check="min_cost",
                     keep_elitism_percentage=self.app_settings.keep_elitism_percentage,
                     max_attempt_no=self.app_settings.saturation_criteria,
+                    parent_selection="from_top_to_bottom",
                     logging=False)
 
             # Addition of variables with specified ranges and steps
@@ -174,7 +178,8 @@ class Experiment:
                                 mutation_type="adaptive",
                                 suppress_warnings=True,
                                 keep_elitism=round((self.app_settings.keep_elitism_percentage / 100) * self.app_settings.population_size),
-                                stop_criteria=f"saturate_{self.app_settings.saturation_criteria}"
+                                stop_criteria=f"saturate_{self.app_settings.saturation_criteria}",
+                                crossover_type=blend_crossover_pygad
                                 )
 
             mutation_type = "adaptive mutation"
