@@ -9,6 +9,7 @@ import pygad
 from gadapt.ga import GA
 
 from plugins.pygad.pygad_blending_crossover import blend_crossover_pygad
+from utils import csv_writter
 from utils.data_aggregation import aggregate_convergence
 from utils.exp_logging import log_message_info
 from runners.gadapt_experiment import execute_gadapt_experiment
@@ -87,7 +88,9 @@ class Experiment:
     def _execute_single_experiment(self):
         result_list = []
         runs: dict = {}
+        min_cost_per_generations_per_run_per_mutation_type: dict = {}
         average_generations: dict = {}
+        app_settings = ExperimentGASettings()
         if self.app_settings.pygad_random_mutation_enabled:
             ##### PyGAD OPTIMIZATION WITH RANDOM MUTATION ###############
             # Define min, max values, and steps for each parameter
@@ -111,6 +114,7 @@ class Experiment:
             optimization_name = f"{self.experiment_name} - {mutation_type}"
             min_cost_per_generations_per_run, average_number_of_generations = execute_pygad_experiment(get_ga_instance, optimization_name, result_list)
             runs[mutation_type] = aggregate_convergence(min_cost_per_generations_per_run, stat=self.app_settings.plot_stat, band=self.app_settings.plot_band)
+            min_cost_per_generations_per_run_per_mutation_type[mutation_type] = min_cost_per_generations_per_run
             average_generations[mutation_type] = average_number_of_generations
             average_generations[mutation_type] = average_number_of_generations
         if self.app_settings.gadapt_random_mutation_enabled:
@@ -136,6 +140,7 @@ class Experiment:
             min_cost_per_generations_per_run, average_number_of_generations = execute_gadapt_experiment(ga, optimization_name,
                                       result_list)
             runs[mutation_type] = aggregate_convergence(min_cost_per_generations_per_run, stat=self.app_settings.plot_stat, band=self.app_settings.plot_band)
+            min_cost_per_generations_per_run_per_mutation_type[mutation_type] = min_cost_per_generations_per_run
             average_generations[mutation_type] = average_number_of_generations
         if self.app_settings.gadapt_diversity_mutation_enabled:
             ##### GADAPT OPTIMIZATION WITH DIVERSITY MUTATION ###############
@@ -161,6 +166,7 @@ class Experiment:
                                                                                                         optimization_name,
                                                                                                         result_list)
             runs[mutation_type] = aggregate_convergence(min_cost_per_generations_per_run, stat=self.app_settings.plot_stat, band=self.app_settings.plot_band)
+            min_cost_per_generations_per_run_per_mutation_type[mutation_type] = min_cost_per_generations_per_run
             average_generations[mutation_type] = average_number_of_generations
         if self.app_settings.pygad_adaptive_mutation_enabled:
             ##### PYGAD OPTIMIZATION WITH ADAPTIVE MUTATION ###############
@@ -188,12 +194,16 @@ class Experiment:
                                                                                                        optimization_name,
                                                                                                        result_list)
             runs[mutation_type] = aggregate_convergence(min_cost_per_generations_per_run, stat=self.app_settings.plot_stat, band=self.app_settings.plot_band)
+            min_cost_per_generations_per_run_per_mutation_type[mutation_type] = min_cost_per_generations_per_run
             average_generations[mutation_type] = average_number_of_generations
         ######### FINAL RESULTS #############
 
         log_message_info("************Final results:************")
         for r in result_list:
             log_message_info(r)
+        if app_settings.log_to_file:
+            csv_writter.aggregated_data_to_csv(runs, filename=self.experiment_name)
+            csv_writter.runs_to_csv(min_cost_per_generations_per_run_per_mutation_type, filename=self.experiment_name)
         if self.app_settings.plot_fitness:
             lowest, highest, max_len = analyze_runs(runs)
             plot_convergence_curve(agg=runs,

@@ -5,8 +5,8 @@ from utils.exp_logging import init_logging
 from settings.experiment_ga_settings import ExperimentGASettings
 
 def run_experiment(experiment: Callable) -> None:
-    init_logging(log_to_file=False)
     app_settings = ExperimentGASettings()
+    init_logging(log_to_file=app_settings.log_to_file)
 
     for a in sys.argv[1:]:
         if a == "plot":

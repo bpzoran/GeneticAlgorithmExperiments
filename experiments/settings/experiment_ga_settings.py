@@ -21,10 +21,12 @@ class ExperimentGASettings:
         pygad_random_mutation_enabled: bool = True,
         gadapt_diversity_mutation_enabled: bool = True,
         pygad_adaptive_mutation_enabled: bool = True,
+        log_to_file: bool = False,
         plot_stat = "mean",
         plot_band = "ci",
             variable_numbers=None,
             saturation_criterias=None,
+        csv_path: str = None
     ):
         # Prevent reinitialization for the singleton
         if getattr(self, "_initialized", False):
@@ -39,6 +41,7 @@ class ExperimentGASettings:
         self._percentage_of_mutation_genes_ = None
         self._keep_elitism_percentage_ = None
         self._pygad_adaptive_mutation_enabled_ = None
+        self._log_to_file_ = None
         self._gadapt_diversity_mutation_enabled_ = None
         self._pygad_random_mutation_enabled_ = None
         self._gadapt_random_mutation_enabled_ = None
@@ -58,11 +61,13 @@ class ExperimentGASettings:
         self._saturation_criteria = saturation_criteria
         self._plot_stat = plot_stat
         self._plot_band = plot_band
+        self._csv_path = csv_path
 
         self._gadapt_random_mutation_enabled = gadapt_random_mutation_enabled
         self._pygad_random_mutation_enabled = pygad_random_mutation_enabled
         self._gadapt_diversity_mutation_enabled = gadapt_diversity_mutation_enabled
         self._pygad_adaptive_mutation_enabled = pygad_adaptive_mutation_enabled
+        self._log_to_file = log_to_file
         self._variable_numbers = variable_numbers
         self._saturation_criterias = saturation_criterias
         self.backup_settings()
@@ -84,8 +89,10 @@ class ExperimentGASettings:
         self._pygad_random_mutation_enabled_ = self.pygad_random_mutation_enabled
         self._gadapt_diversity_mutation_enabled_ = self.gadapt_diversity_mutation_enabled
         self._pygad_adaptive_mutation_enabled_ = self.pygad_adaptive_mutation_enabled
+        self._log_to_file_ = self.log_to_file
         self._plot_stat_ = self.plot_stat
         self._plot_band_ = self.plot_band
+        self._csv_path_ = self.csv_path
         self._variable_numbers_ = self._variable_numbers
         self._saturation_criterias_ = self._saturation_criterias
     def restore_settings(self):
@@ -103,8 +110,10 @@ class ExperimentGASettings:
         self.pygad_random_mutation_enabled = self._pygad_random_mutation_enabled_
         self.gadapt_diversity_mutation_enabled = self._gadapt_diversity_mutation_enabled_
         self.pygad_adaptive_mutation_enabled = self._pygad_adaptive_mutation_enabled_
+        self.log_to_file = self._log_to_file_
         self.plot_stat = self._plot_stat_
         self.plot_band = self._plot_band_
+        self.csv_path = self._csv_path_
         self.variable_numbers = self._variable_numbers_
         self.saturation_criterias = self._saturation_criterias_
 
@@ -241,6 +250,16 @@ class ExperimentGASettings:
         self._pygad_adaptive_mutation_enabled = value
 
     @property
+    def log_to_file(self) -> bool:
+        return self._log_to_file
+
+    @log_to_file.setter
+    def log_to_file(self, value: bool):
+        if not isinstance(value, bool):
+            raise ValueError("log_to_file must be a boolean")
+        self._log_to_file = value
+
+    @property
     def plot_stat(self) -> str:
         return self._plot_stat
 
@@ -253,6 +272,10 @@ class ExperimentGASettings:
     @property
     def plot_band(self) -> str:
         return self._plot_band
+
+    @property
+    def csv_path(self) -> str:
+        return self._csv_path
 
     @property
     def variable_numbers(self) -> list[int]:
@@ -280,6 +303,12 @@ class ExperimentGASettings:
             raise ValueError("plot_band must be a string")
         self._plot_band = value
 
+    @csv_path.setter
+    def csv_path(self, value: str):
+        if not isinstance(value, str):
+            raise ValueError("csv_path must be a string")
+        self._csv_path = value
+
     def __repr__(self):
         return (
             f"ExperimentGASettings("
@@ -296,8 +325,10 @@ class ExperimentGASettings:
             f"pygad_random_mutation_enabled={self.pygad_random_mutation_enabled}, "
             f"gadapt_diversity_mutation_enabled={self.gadapt_diversity_mutation_enabled}, "
             f"pygad_adaptive_mutation_enabled={self.pygad_adaptive_mutation_enabled}, "
+            f"log_to_file={self.log_to_file}, "
             f"plot_stat={self.plot_stat}"
             f"plot_band={self.plot_band}"
+            f"csv_path={self.csv_path}"
             f"variable_numbers={self.variable_numbers}"
             f"saturation_criterias={self.saturation_criterias}"
             f")"
