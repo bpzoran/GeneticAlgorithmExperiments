@@ -213,7 +213,9 @@ class Experiment:
                                    max_len=max_len,
                                    stat=self.app_settings.plot_stat,
                                    band=self.app_settings.plot_band,
-                                   description=self.experiment_name)
+                                   description=self.experiment_name,
+                                   outdir=app_settings.plot_path,
+                                   save=app_settings.log_to_file)
 
 
 def analyze_runs(runs: dict[str, dict[str, np.ndarray]]):

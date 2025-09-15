@@ -21,11 +21,19 @@ def init_logging(log_to_file: bool):
     formatted_date_time = now.strftime('%Y_%m_%d_%H_%M_%S_') + f'{now.microsecond // 1000:03d}'
     log_path = os.path.join(path, f"ga_exp_log_{formatted_date_time}.log")
     csv_path = os.path.join(os.getcwd(), "csv")
-
+    if not os.path.exists(csv_path):
+        os.mkdir(csv_path)
     csv_path = os.path.join(csv_path, formatted_date_time)
     if not os.path.exists(csv_path):
         os.mkdir(csv_path)
     app_settings.csv_path = csv_path
+    plot_path = os.path.join(os.getcwd(), "plot")
+    if not os.path.exists(plot_path):
+        os.mkdir(plot_path)
+    plot_path = os.path.join(plot_path, formatted_date_time)
+    if not os.path.exists(plot_path):
+        os.mkdir(plot_path)
+    app_settings.plot_path = plot_path
     logger = logging.getLogger("ga_exp_logger")
     for h in logger.handlers:
         logger.removeHandler(h)

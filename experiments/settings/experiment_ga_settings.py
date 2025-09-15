@@ -21,12 +21,13 @@ class ExperimentGASettings:
         pygad_random_mutation_enabled: bool = True,
         gadapt_diversity_mutation_enabled: bool = True,
         pygad_adaptive_mutation_enabled: bool = True,
-        log_to_file: bool = False,
+        log_to_file: bool = True,
         plot_stat = "mean",
         plot_band = "ci",
             variable_numbers=None,
             saturation_criterias=None,
-        csv_path: str = None
+        csv_path: str = None,
+        plot_path: str = None
     ):
         # Prevent reinitialization for the singleton
         if getattr(self, "_initialized", False):
@@ -62,7 +63,7 @@ class ExperimentGASettings:
         self._plot_stat = plot_stat
         self._plot_band = plot_band
         self._csv_path = csv_path
-
+        self._plot_path = plot_path
         self._gadapt_random_mutation_enabled = gadapt_random_mutation_enabled
         self._pygad_random_mutation_enabled = pygad_random_mutation_enabled
         self._gadapt_diversity_mutation_enabled = gadapt_diversity_mutation_enabled
@@ -93,6 +94,7 @@ class ExperimentGASettings:
         self._plot_stat_ = self.plot_stat
         self._plot_band_ = self.plot_band
         self._csv_path_ = self.csv_path
+        self._plot_path_ = self.plot_path
         self._variable_numbers_ = self._variable_numbers
         self._saturation_criterias_ = self._saturation_criterias
     def restore_settings(self):
@@ -114,6 +116,7 @@ class ExperimentGASettings:
         self.plot_stat = self._plot_stat_
         self.plot_band = self._plot_band_
         self.csv_path = self._csv_path_
+        self.plot_path = self._plot_path_
         self.variable_numbers = self._variable_numbers_
         self.saturation_criterias = self._saturation_criterias_
 
@@ -278,6 +281,10 @@ class ExperimentGASettings:
         return self._csv_path
 
     @property
+    def plot_path(self) -> str:
+        return self._plot_path
+
+    @property
     def variable_numbers(self) -> list[int]:
         return self._variable_numbers
 
@@ -309,6 +316,12 @@ class ExperimentGASettings:
             raise ValueError("csv_path must be a string")
         self._csv_path = value
 
+    @plot_path.setter
+    def plot_path(self, value: str):
+        if not isinstance(value, str):
+            raise ValueError("plot_path must be a string")
+        self._plot_path = value
+
     def __repr__(self):
         return (
             f"ExperimentGASettings("
@@ -329,6 +342,7 @@ class ExperimentGASettings:
             f"plot_stat={self.plot_stat}"
             f"plot_band={self.plot_band}"
             f"csv_path={self.csv_path}"
+            f"plot_path={self.plot_path}"
             f"variable_numbers={self.variable_numbers}"
             f"saturation_criterias={self.saturation_criterias}"
             f")"

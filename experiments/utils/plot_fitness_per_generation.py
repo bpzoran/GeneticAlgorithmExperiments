@@ -1,3 +1,4 @@
+import os
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -7,14 +8,19 @@ def plot_convergence_curve(
     lowest: float,
     highest: float,
     max_len: float,
-    stat: str = "mean",            # "mean" or "median"
-    band: str = "ci",              # "ci" for 95% CI, "iqr" for interquartile (25–75%)
+    stat: str = "mean",            # kept for compatibility
+    band: str = "ci",              # kept for compatibility
     description: str = "GA Convergence (central tendency ± variability)",
     ylabel: str = "Fitness",
     xlabel: str = "Generation",
     annotate_counts: bool = True,  # plot diagnostic figure with #runs per generation
     vline_kw: dict | None = None,
     text_kw: dict | None = None,
+    # --- NEW ---
+    save: bool = False,
+    outdir: str | None = None,
+    basename: str = "convergence",
+    formats: tuple[str, ...] = ("png",),
 ):
     """
     agg:
@@ -23,8 +29,14 @@ def plot_convergence_curve(
     x0:
       - single: float
       - multi:  {label: float}
+
+    Saving:
+      If save=True, figures are saved to `outdir` using `basename` and `formats`
+      (e.g., basename.png, basename_counts.png) and not shown. Returns the list
+      of saved file paths. If save=False, figures are shown and [] is returned.
     """
     description = transform_function_string(description)
+
     # Normalize to multi-series dict: label -> series_dict
     is_single = isinstance(agg, dict) and {"gen", "center", "lower", "upper"} <= set(agg.keys())
     if is_single:
@@ -97,32 +109,28 @@ def plot_convergence_curve(
 
     # ---- Stack "Avg gen =" annotations so they don't overlap ----
     if vline_info:
-        # Sort by x0 so stacking is deterministic (left -> right)
-        vline_info.sort(key=lambda t: t[1])
-
+        vline_info.sort(key=lambda t: t[1])  # left -> right
         y_min, y_max = ax.get_ylim()
         y_range = y_max - y_min
-
-        top_anchor_frac = 0.95         # start near the top
-        stack_band_frac = 0.25         # use top 25% of the plot for stacking
+        top_anchor_frac = 0.95
+        stack_band_frac = 0.25
         n = len(vline_info)
-        dy_frac = stack_band_frac / max(n, 1)  # vertical step in fraction of y-range
+        dy_frac = stack_band_frac / max(n, 1)
 
         for i, (label, x0_val, color) in enumerate(vline_info):
-            # place labels one under another within the top band
             y_text = y_min + (top_anchor_frac - i * dy_frac) * y_range
-
-            # place left of the line if too close to right edge
             x_min, x_max = ax.get_xlim()
             place_left = x0_val > (x_min + 0.85 * (x_max - x_min))
             dx = -6 if place_left else 6
-
             ax.annotate(f"Avg gen = {round(x0_val):g}",
                         xy=(x0_val, y_text), xytext=(dx, 0),
                         textcoords='offset points',
                         color=color, ha='left', va='center')
 
+    saved_paths: list[str] = []
+
     # --- Diagnostic plot: #runs per generation for all series ---
+    fig2, ax2 = None, None
     if annotate_counts:
         fig2, ax2 = plt.subplots()
         ax2.set_xlim(0 - xpad_left, max_len)
@@ -139,8 +147,6 @@ def plot_convergence_curve(
             gen, n_at_gen = gen[order], n_at_gen[order]
             line2, = ax2.plot(gen, n_at_gen, label=label)
             c = colors_by_label.get(label, line2.get_color())
-
-            # vline + stacked annotation on diagnostic too (optional: same order)
             if label in x0_map:
                 x0_val = x0_map[label]
                 ax2.axvline(x0_val, **{**vk, "color": c})
@@ -148,9 +154,38 @@ def plot_convergence_curve(
         ax2.legend()
         fig2.subplots_adjust(bottom=0.22)
         fig2.text(0.5, 0.04, description, ha="center", va="bottom", wrap=True)
-        plt.show()
+    # --- Save or Show ---
+    if save:
+        # directory defaults to CWD if not provided
+        outdir_final = outdir or os.getcwd()
+        os.makedirs(outdir_final, exist_ok=True)
 
+        # sanitize basename lightly (no path separators)
+        safe_base = basename.replace(os.sep, "_").replace("/", "_")
+
+        # main figure
+        for ext in formats:
+            path = os.path.join(outdir_final, f"{safe_base}.{ext.lstrip('.')}")
+            fig.savefig(path, dpi=200, bbox_inches="tight")
+            saved_paths.append(path)
+
+        # diagnostic figure
+        if annotate_counts and fig2 is not None:
+            for ext in formats:
+                path = os.path.join(outdir_final, f"{safe_base}_counts.{ext.lstrip('.')}")
+                fig2.savefig(path, dpi=200, bbox_inches="tight")
+                saved_paths.append(path)
+
+        plt.close(fig)
+        if fig2 is not None:
+            plt.close(fig2)
+        return saved_paths
+
+    # default behavior: show
+    if annotate_counts and fig2 is not None:
+        plt.show()
     plt.show()
+    return []
 
 def transform_function_string(text: str) -> str:
     words = text.split()
@@ -159,7 +194,5 @@ def transform_function_string(text: str) -> str:
         if "_func" in word:
             word = word.replace("func", "Function")
         new_words.append(word)
-    # replace underscores with spaces
     result = " ".join(new_words).replace("_", " ")
-    # capitalize every word
     return result.title()
