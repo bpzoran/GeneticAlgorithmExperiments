@@ -33,7 +33,7 @@ def execute_gadapt_experiment(ga,
         if num_of_generations > results.number_of_iterations:
             num_of_generations = results.number_of_iterations
         fitness_per_generation.append(float(results.min_cost_per_generation[num_of_generations - 1]))
-        if i % app_settings.logging_step == 0:
+        if (i != 0) and (i % app_settings.logging_step == 0):
             final_min_cost = ga_utils.average(cost_values)
             avg_num_of_it = ga_utils.average(iteration_numbers)
             log_message_info(f"GAdapt - {optimization_name} - Optimization number {i}.")
