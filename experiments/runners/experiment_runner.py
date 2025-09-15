@@ -6,7 +6,8 @@ from settings.experiment_ga_settings import ExperimentGASettings
 
 def run_experiment(experiment: Callable) -> None:
     app_settings = ExperimentGASettings()
-    init_logging(log_to_file=app_settings.log_to_file)
+    if app_settings.csv_path is None:
+        init_logging(log_to_file=app_settings.log_to_file)
 
     for a in sys.argv[1:]:
         if a == "plot":
