@@ -202,8 +202,8 @@ class Experiment:
         for r in result_list:
             log_message_info(r)
         if app_settings.log_to_file:
-            csv_writter.aggregated_data_to_csv(runs, filename=self.experiment_name)
-            csv_writter.runs_to_csv(min_cost_per_generations_per_run_per_mutation_type, filename=self.experiment_name)
+            csv_writter.aggregated_data_to_csv(runs, experiment_name=self.experiment_name)
+            csv_writter.runs_to_csv(min_cost_per_generations_per_run_per_mutation_type, experiment_name=self.experiment_name)
         if self.app_settings.plot_fitness:
             lowest, highest, max_len = analyze_runs(runs)
             plot_convergence_curve(agg=runs,
