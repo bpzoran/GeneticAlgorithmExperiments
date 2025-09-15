@@ -215,7 +215,8 @@ class Experiment:
                                    band=self.app_settings.plot_band,
                                    description=self.experiment_name,
                                    outdir=app_settings.plot_path,
-                                   save=app_settings.log_to_file)
+                                   save=app_settings.log_to_file,
+                                   basename=self.experiment_name,)
 
 
 def analyze_runs(runs: dict[str, dict[str, np.ndarray]]):

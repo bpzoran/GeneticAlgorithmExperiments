@@ -15,7 +15,7 @@ class ExperimentGASettings:
         num_runs: int = 1000,
         logging_step: int = 50,
         number_of_generations: int = 40,
-        plot_fitness: bool = False,
+        plot_fitness: bool = True,
         saturation_criteria: int = 10,
         gadapt_random_mutation_enabled: bool = False,
         pygad_random_mutation_enabled: bool = True,
