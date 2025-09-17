@@ -91,6 +91,9 @@ class Experiment:
         min_cost_per_generations_per_run_per_mutation_type: dict = {}
         average_generations: dict = {}
         app_settings = ExperimentGASettings()
+        pygad_mutation_percentage_up = round(self.app_settings.percentage_of_mutation_chromosomes * (
+                    self.app_settings.percentage_of_mutation_genes / 100))
+        pygad_mutation_percentage_down = round(pygad_mutation_percentage_up * self.app_settings.mutation_ratio)
         if self.app_settings.pygad_random_mutation_enabled:
             ##### PyGAD OPTIMIZATION WITH RANDOM MUTATION ###############
             # Define min, max values, and steps for each parameter
@@ -103,12 +106,13 @@ class Experiment:
                                 gene_type=float,
                                 gene_space=self._args_bounds,
                                 fitness_func=self.fitness_func,
-                                mutation_percent_genes=self.app_settings.percentage_of_mutation_genes,
+                                #mutation_percent_genes=self.app_settings.percentage_of_mutation_genes,
                                 mutation_type="random",
                                 suppress_warnings=True,
                                 keep_elitism=round((self.app_settings.keep_elitism_percentage / 100) * self.app_settings.population_size),
                                 stop_criteria=f"saturate_{self.app_settings.saturation_criteria}",
-                                crossover_type=blend_crossover_pygad
+                                crossover_type=blend_crossover_pygad,
+                                mutation_probability=pygad_mutation_percentage_down / 100
                                 )
             mutation_type = "random mutation"
             optimization_name = f"{self.experiment_name} - {mutation_type}"
@@ -170,7 +174,6 @@ class Experiment:
             average_generations[mutation_type] = average_number_of_generations
         if self.app_settings.pygad_adaptive_mutation_enabled:
             ##### PYGAD OPTIMIZATION WITH ADAPTIVE MUTATION ###############
-
             def get_ga_instance():
                 return pygad.GA(num_generations=1000,
                                 num_parents_mating=round((self.app_settings.keep_elitism_percentage / 100) * self.app_settings.population_size),
@@ -180,7 +183,7 @@ class Experiment:
                                 gene_type=float,
                                 gene_space=self._args_bounds,
                                 fitness_func=self.fitness_func,
-                                mutation_percent_genes=[60, 40],
+                                mutation_percent_genes=[pygad_mutation_percentage_up, pygad_mutation_percentage_down],
                                 mutation_type="adaptive",
                                 suppress_warnings=True,
                                 keep_elitism=round((self.app_settings.keep_elitism_percentage / 100) * self.app_settings.population_size),

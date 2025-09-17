@@ -6,3 +6,4 @@ experiments/log/*
 /experiments/test02.py
 experiments/plots/*
 .venv/*
+*wilcoxon_from_experiment.py

@@ -11,6 +11,7 @@ class ExperimentGASettings:
         population_size: int = 64,
         percentage_of_mutation_chromosomes: float = 80.0,
         percentage_of_mutation_genes: float = 50.0,
+        mutation_ratio: float = 0.25,
         keep_elitism_percentage: float = 50.0,
         num_runs: int = 1000,
         logging_step: int = 50,
@@ -40,6 +41,7 @@ class ExperimentGASettings:
         self._population_size_ = None
         self._percentage_of_mutation_chromosomes_ = None
         self._percentage_of_mutation_genes_ = None
+        self._mutation_ratio_ = None
         self._keep_elitism_percentage_ = None
         self._pygad_adaptive_mutation_enabled_ = None
         self._log_to_file_ = None
@@ -54,6 +56,7 @@ class ExperimentGASettings:
         self._population_size = population_size
         self._percentage_of_mutation_chromosomes = percentage_of_mutation_chromosomes
         self._percentage_of_mutation_genes = percentage_of_mutation_genes
+        self._mutation_ratio = mutation_ratio
         self._keep_elitism_percentage = keep_elitism_percentage
         self._num_runs = num_runs
         self._logging_step = logging_step
@@ -79,6 +82,7 @@ class ExperimentGASettings:
         self._population_size_ = self.population_size
         self._percentage_of_mutation_chromosomes_ = self.percentage_of_mutation_chromosomes
         self._percentage_of_mutation_genes_ = self.percentage_of_mutation_genes
+        self._mutation_ratio_ = self.mutation_ratio
         self._keep_elitism_percentage_ = self.keep_elitism_percentage
         self._num_runs_ = self.num_runs
         self._logging_step_ = self.logging_step
@@ -101,6 +105,7 @@ class ExperimentGASettings:
         self.population_size = self._population_size_
         self.percentage_of_mutation_chromosomes = self._percentage_of_mutation_chromosomes_
         self.percentage_of_mutation_genes = self._percentage_of_mutation_genes_
+        self.mutation_ratio = self._mutation_ratio_
         self.keep_elitism_percentage = self._keep_elitism_percentage_
         self.num_runs = self._num_runs_
         self.logging_step = self._logging_step_
@@ -149,6 +154,16 @@ class ExperimentGASettings:
         if not (0.0 <= value <= 100.0):
             raise ValueError("percentage_of_mutation_genes must be between 0 and 100")
         self._percentage_of_mutation_genes = value
+
+    @property
+    def mutation_ratio(self) -> float:
+        return self._mutation_ratio
+
+    @mutation_ratio.setter
+    def mutation_ratio(self, value: float):
+        if not (0.0 <= value <= 100.0):
+            raise ValueError("mutation_ratio must be between 0 and 100")
+        self._mutation_ratio = value
 
     @property
     def keep_elitism_percentage(self) -> float:
@@ -328,6 +343,7 @@ class ExperimentGASettings:
             f"population_size={self.population_size}, "
             f"percentage_of_mutation_chromosomes={self.percentage_of_mutation_chromosomes}, "
             f"percentage_of_mutation_genes={self.percentage_of_mutation_genes}, "
+            f"mutation_ratio={self.mutation_ratio}, "
             f"keep_elitism_percentage={self.keep_elitism_percentage}, "
             f"num_runs={self.num_runs}, "
             f"logging_step={self.logging_step}, "
