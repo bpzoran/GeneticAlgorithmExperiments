@@ -1,9 +1,9 @@
 import math
 
 
-def simple_trigonometric_arithmetic_func(args):
+def moderately_coupled_trigonometric_func(args):
     """
-    The function simple_trigonometric_arithmetic_function computes the sum of five terms derived from its input list
+    The function moderately_coupled_trigonometric_func computes the sum of five terms derived from its input list
     args, involving square roots, squares, and trigonometric calculations.
     Calculate the square root of the first element in args.
     Compute the square of the cosine of the second element in args.

@@ -1,5 +1,7 @@
 import csv
+import math
 import os
+from typing import Any, Dict
 
 from settings.experiment_ga_settings import ExperimentGASettings
 
@@ -54,3 +56,92 @@ def runs_to_csv(data: dict, experiment_name: str) -> str:
                     writer.writerow([experiment_name, strategy, run_idx, gen_idx, cost])
 
     return file_path
+
+def results_to_csv(results: dict, experiment_name: str) -> None:
+    if not experiment_name.endswith(".csv"):
+        experiment_name += ".csv"
+    app_settings = ExperimentGASettings()
+    # Ensure directory exists
+    directory = app_settings.csv_path
+    os.makedirs(directory, exist_ok=True)
+    full_path = os.path.join(directory, f"final_results_{experiment_name}")
+
+    # Extract the experiment data
+    experiment_data = results.get("Experiment", {})
+    experiment_name = experiment_data.get("Experiment name", "")
+    num_vars = experiment_data.get("Number of variables", "")
+    saturation = experiment_data.get("Saturation after generations", "")
+
+    # Define header
+    header = [
+        "Experiment name",
+        "Number of variables",
+        "Saturation after generations",
+        "Mutation type",
+        "Average fitness",
+        f"Average fitness after {app_settings.number_of_generations} generations",
+        "Average number of generations"
+    ]
+
+    with open(full_path, mode="w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow(header)
+
+        for mutation_type, metrics in experiment_data.items():
+            if mutation_type in ("Experiment name", "Number of variables", "Saturation after generations"):
+                continue  # skip metadata
+            writer.writerow([
+                experiment_name,
+                num_vars,
+                saturation,
+                mutation_type,
+                metrics.get("Average fitness", ""),
+                metrics.get(next((k for k in metrics if k.startswith("Average fitness after")), ""), ""),
+                metrics.get("Average number of generations", "")
+            ])
+def export_ga_summary_to_csv(
+    summary: Dict[str, Dict[str, Any]],
+    experiment_name: str,
+    float_fmt: str = ".6f",
+) -> str:
+    if not experiment_name.endswith(".csv"):
+        experiment_name += ".csv"
+    app_settings = ExperimentGASettings()
+    # Ensure directory exists
+    directory = app_settings.csv_path
+    os.makedirs(directory, exist_ok=True)
+    full_path = os.path.join(directory, f"final_results_{experiment_name}")
+
+    fieldnames = [
+        "strategy",
+        "num_runs",
+        "avg_min_fitness",
+        "rsd_min_fitness",
+        "avg_generations",
+        "avg_fitness_after_n",
+        "avg_slope_first_n",
+    ]
+
+    def _fmt(x: Any) -> Any:
+        if isinstance(x, float):
+            if math.isnan(x) or math.isinf(x):
+                return ""
+            return format(x, float_fmt)
+        return x
+
+    with open(full_path, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        for strategy, metrics in summary.items():
+            row = {
+                "strategy": strategy,
+                "num_runs": metrics.get("num_runs"),
+                "avg_min_fitness": _fmt(metrics.get("avg_min_fitness")),
+                "rsd_min_fitness": _fmt(metrics.get("rsd_min_fitness")),
+                "avg_generations": _fmt(metrics.get("avg_generations")),
+                "avg_fitness_after_n": _fmt(metrics.get("avg_fitness_after_n")),
+                "avg_slope_first_n": _fmt(metrics.get("avg_slope_first_n")),
+            }
+            writer.writerow(row)
+
+    return full_path

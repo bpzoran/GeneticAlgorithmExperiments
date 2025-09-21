@@ -2,14 +2,15 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 
+from utils.experiment_utils import transform_function_string
+
+
 def plot_convergence_curve(
     agg,
     x0,
     lowest: float,
     highest: float,
     max_len: float,
-    stat: str = "mean",            # kept for compatibility
-    band: str = "ci",              # kept for compatibility
     description: str = "GA Convergence (central tendency ± variability)",
     ylabel: str = "Fitness",
     xlabel: str = "Generation",
@@ -36,7 +37,7 @@ def plot_convergence_curve(
       of saved file paths. If save=False, figures are shown and [] is returned.
     """
     description = transform_function_string(description)
-
+    len_border = round(max(x0.values())) + 1
     # Normalize to multi-series dict: label -> series_dict
     is_single = isinstance(agg, dict) and {"gen", "center", "lower", "upper"} <= set(agg.keys())
     if is_single:
@@ -58,9 +59,9 @@ def plot_convergence_curve(
     cap_ax.text(0.5, 0.5, description, ha='center', va='center', wrap=True)
 
     # Global limits
-    xpad_left = round(max_len / 20)
+    xpad_left = round(len_border / 20)
     ypad_bottom = (highest - lowest) / 20
-    ax.set_xlim(0 - xpad_left, max_len)
+    ax.set_xlim(0 - xpad_left, len_border)
     ax.set_ylim(lowest - ypad_bottom, highest)
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
@@ -186,13 +187,3 @@ def plot_convergence_curve(
         plt.show()
     plt.show()
     return []
-
-def transform_function_string(text: str) -> str:
-    words = text.split()
-    new_words = []
-    for word in words:
-        if "_func" in word:
-            word = word.replace("func", "Function")
-        new_words.append(word)
-    result = " ".join(new_words).replace("_", " ")
-    return result.title()

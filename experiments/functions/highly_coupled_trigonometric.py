@@ -1,9 +1,9 @@
 import math
 
 
-def complex_trig_func(args):
+def highly_coupled_trigonometric_func(args):
     """
-    The complex_trig_func function computes a complex mathematical expression involving trigonometric and
+    The highly_coupled_trigonometric function computes a complex mathematical expression involving trigonometric and
     algebraic operations on elements of an input list args.
 
     This function performs the following steps:

@@ -11,8 +11,6 @@ def execute():
     app_settings = ExperimentGASettings()
     app_settings.saturation_criterias = list(set(app_settings.saturation_criterias) & set(saturation_criterias))
     experiment = Experiment(ackley_func)
-    app_settings = ExperimentGASettings()
-    app_settings.saturation_criteria = 30
     experiment.fill_args_with_same_values(-4, 4, variable_numbers, 0.08)
     experiment.execute_experiment()
 

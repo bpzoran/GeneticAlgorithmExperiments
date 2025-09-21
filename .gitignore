@@ -7,3 +7,5 @@ experiments/log/*
 experiments/plots/*
 .venv/*
 *wilcoxon_from_experiment.py
+/experiments/csv/*
+/experiments/plot/*

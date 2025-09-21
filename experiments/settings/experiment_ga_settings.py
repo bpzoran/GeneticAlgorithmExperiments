@@ -9,13 +9,13 @@ class ExperimentGASettings:
     def __init__(
         self,
         population_size: int = 64,
-        percentage_of_mutation_chromosomes: float = 80.0,
+        percentage_of_mutation_chromosomes: float = 50,
         percentage_of_mutation_genes: float = 50.0,
-        mutation_ratio: float = 0.25,
+        mutation_ratio: float = 0.1,
         keep_elitism_percentage: float = 50.0,
         num_runs: int = 1000,
         logging_step: int = 50,
-        number_of_generations: int = 40,
+        number_of_generations: int = 10,
         plot_fitness: bool = True,
         saturation_criteria: int = 10,
         gadapt_random_mutation_enabled: bool = False,
@@ -36,7 +36,7 @@ class ExperimentGASettings:
         if variable_numbers is None:
             variable_numbers = [2, 3, 4, 5, 6, 7, 8, 9, 10]
         if saturation_criterias is None:
-            saturation_criterias = [10, 20, 30]
+            saturation_criterias = [5, 10, 20, 30, 50, 100]
 
         self._population_size_ = None
         self._percentage_of_mutation_chromosomes_ = None

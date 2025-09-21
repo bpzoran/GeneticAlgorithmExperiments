@@ -13,7 +13,7 @@ def execute():
     app_settings.saturation_criterias = list(set(app_settings.saturation_criterias) & set(saturation_criterias))
     app_settings.plot_fitness = True
     experiment = Experiment(rastrigin_func)
-    experiment.fill_args_with_same_values(-5.12, 5.12, variable_numbers, 0.1024)
+    experiment.fill_args_with_same_values(-5.12, 5.12, variable_numbers)
     experiment.execute_experiment()
 
 def main():

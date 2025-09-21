@@ -4,7 +4,7 @@ from settings.experiment_ga_settings import ExperimentGASettings
 from utils.exp_logging import log_message_info
 from runners.experiment import Experiment
 from runners.experiment_runner import run_experiment
-from functions.simple_trig import simple_trig_func
+from functions.moderately_coupled_trigonometric import simple_trig_func
 
 saturation_criterias = [10, 30]
 
