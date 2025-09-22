@@ -1,9 +1,9 @@
 import numpy as np
 
 
-def simple_trig_func(args):
+def moderately_coupled_trigonometric_func(args):
     """
-    Arithmetic / trigonometric function computes a mathematical expression using trigonometric
+    Moderately coupled trigonometric function computes a mathematical expression using trigonometric
     and arithmetic operations on elements of an input array.
 
     This function performs the following steps:
