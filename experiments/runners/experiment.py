@@ -108,7 +108,6 @@ class Experiment:
                                 gene_type=float,
                                 gene_space=self._args_bounds,
                                 fitness_func=self.fitness_func,
-                                #mutation_percent_genes=self.app_settings.percentage_of_mutation_genes,
                                 mutation_type="random",
                                 suppress_warnings=True,
                                 keep_elitism=round((self.app_settings.keep_elitism_percentage / 100) * self.app_settings.population_size),
@@ -250,7 +249,7 @@ class Experiment:
             csv_writter.aggregated_data_to_csv(runs, experiment_name=transform_function_string(self.experiment_name))
             csv_writter.runs_to_csv(min_cost_per_generations_per_run_per_mutation_type, experiment_name=transform_function_string(self.experiment_name))
             ga_summary = summarize_ga(min_cost_per_generations_per_run_per_mutation_type, app_settings.number_of_generations)
-            csv_writter.export_ga_summary_to_csv(ga_summary, experiment_name=self.experiment_name)
+            csv_writter.export_ga_summary_to_csv(ga_summary, experiment_name=transform_function_string(self._experiment_name), number_of_variables=len(self._args_bounds), saturation_generations=self.app_settings.saturation_criteria)
         if self.app_settings.plot_fitness:
             lowest, highest, max_len = analyze_runs(runs)
             fitness_range = get_fitness_range(final_results, lowest, highest)

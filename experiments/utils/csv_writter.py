@@ -102,6 +102,8 @@ def results_to_csv(results: dict, experiment_name: str) -> None:
 def export_ga_summary_to_csv(
     summary: Dict[str, Dict[str, Any]],
     experiment_name: str,
+    number_of_variables: int,
+    saturation_generations: int,
     float_fmt: str = ".6f",
 ) -> str:
     if not experiment_name.endswith(".csv"):
@@ -113,6 +115,9 @@ def export_ga_summary_to_csv(
     full_path = os.path.join(directory, f"final_results_{experiment_name}")
 
     fieldnames = [
+        "experiment",
+        "number_of_variables",
+        "saturation_generations",
         "strategy",
         "num_runs",
         "avg_min_fitness",
@@ -134,6 +139,9 @@ def export_ga_summary_to_csv(
         writer.writeheader()
         for strategy, metrics in summary.items():
             row = {
+                "experiment": experiment_name,
+                "number_of_variables": number_of_variables,
+                "saturation_generations": saturation_generations,
                 "strategy": strategy,
                 "num_runs": metrics.get("num_runs"),
                 "avg_min_fitness": _fmt(metrics.get("avg_min_fitness")),
