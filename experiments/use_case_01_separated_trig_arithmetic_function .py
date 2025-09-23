@@ -2,7 +2,7 @@ from settings.experiment_ga_settings import ExperimentGASettings
 from utils.exp_logging import log_message_info
 from runners.experiment import Experiment
 from runners.experiment_runner import run_experiment
-from functions.separated_trig_arithmetic import moderately_coupled_trigonometric_func
+from functions.separated_trig_arithmetic import separated_trig_arithmetic_func
 
 saturation_criterias = [10, 30]
 def execute():
@@ -16,7 +16,7 @@ def execute():
                    {"low": 0, "high": 100, "step": 1},  # arg5
                    ]
 
-    experiment = Experiment(moderately_coupled_trigonometric_func, args_bounds=args_bounds)
+    experiment = Experiment(separated_trig_arithmetic_func, args_bounds=args_bounds)
     experiment.execute_experiment()
 
 def main():

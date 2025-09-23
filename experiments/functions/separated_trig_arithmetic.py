@@ -1,7 +1,7 @@
 import math
 
 
-def moderately_coupled_trigonometric_func(args):
+def separated_trig_arithmetic_func(args):
     """
     The function moderately_coupled_trigonometric_func computes the sum of five terms derived from its input list
     args, involving square roots, squares, and trigonometric calculations.
