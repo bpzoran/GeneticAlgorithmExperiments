@@ -8,6 +8,13 @@ from settings.experiment_ga_settings import ExperimentGASettings
 
 log_message_info("Start optimization with PyGad:")
 
+def find_fitness_for_first_generation(func, population: np.ndarray) -> float:
+    fitness = 0.0
+    costs = []
+    for individual in population:
+        costs.append(func(None, individual, None))
+    return max(costs)
+
 # Define fitness function
 def execute_pygad_experiment(pygad_creator,
                              optimization_name: str = "",
@@ -23,7 +30,7 @@ def execute_pygad_experiment(pygad_creator,
         # Create genetic algorithm optimizer
         ga_instance = pygad_creator()
         fitness_values = []
-
+        fitness_values.append(find_fitness_for_first_generation(ga_instance.fitness_func, ga_instance.initial_population))
         def callback_generation(ga_inst):
             fitness_values.append(ga_instance.best_solution()[1])
 
