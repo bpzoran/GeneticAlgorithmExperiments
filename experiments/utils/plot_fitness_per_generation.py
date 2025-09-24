@@ -1,4 +1,16 @@
+# ---- MUST be first: pick a headless-safe backend BEFORE importing pyplot ----
 import os
+
+# Respect a user-specified backend if set; otherwise default to Agg (safe for RDP/headless).
+if "MPLBACKEND" not in os.environ:
+    # Setting via matplotlib.use() must happen before importing pyplot.
+    import matplotlib
+    matplotlib.use("Agg")  # Non-interactive backend avoids Tk/Qt crashes on headless/RDP
+else:
+    import matplotlib  # still import to access get_backend later if needed
+
+# -----------------------------------------------------------------------------
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -38,6 +50,7 @@ def plot_convergence_curve(
     """
     description = transform_function_string(description)
     len_border = round(max(x0.values())) + 1
+
     # Normalize to multi-series dict: label -> series_dict
     is_single = isinstance(agg, dict) and {"gen", "center", "lower", "upper"} <= set(agg.keys())
     if is_single:
@@ -155,9 +168,9 @@ def plot_convergence_curve(
         ax2.legend()
         fig2.subplots_adjust(bottom=0.22)
         fig2.text(0.5, 0.04, description, ha="center", va="bottom", wrap=True)
+
     # --- Save or Show ---
     if save:
-        # directory defaults to CWD if not provided
         outdir_final = outdir or os.getcwd()
         os.makedirs(outdir_final, exist_ok=True)
 
@@ -182,7 +195,7 @@ def plot_convergence_curve(
             plt.close(fig2)
         return saved_paths
 
-    # default behavior: show
+    # default behavior: show (no-op on Agg, but safe)
     if annotate_counts and fig2 is not None:
         plt.show()
     plt.show()
