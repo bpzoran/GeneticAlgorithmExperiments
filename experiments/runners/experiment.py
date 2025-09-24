@@ -153,8 +153,9 @@ class Experiment:
             self.fill_gadapt_with_args(ga)
             mutation_type = "random mutation"
             optimization_name = f"{self.experiment_name} - {mutation_type}"
-            min_cost_per_generations_per_run, final_min_cost, mean_fitness_per_generation, average_number_of_generations = execute_gadapt_experiment(ga, optimization_name,
-                                      result_list)
+            min_cost_per_generations_per_run, final_min_cost, mean_fitness_per_generation, average_number_of_generations = execute_gadapt_experiment(
+                ga, optimization_name,
+                result_list)
             final_results.setdefault("Experiment", {})
             final_results["Experiment"]["Experiment name"] = transform_function_string(self._experiment_name)
             final_results["Experiment"]["Number of variables"] = len(self._args_bounds)
@@ -164,7 +165,9 @@ class Experiment:
                 f"Average fitness after {app_settings.number_of_generations} generations": f"{mean_fitness_per_generation:.10f}",
                 "Average number of generations": f"{average_number_of_generations:.10f}"
             }
-            runs[mutation_type] = aggregate_convergence(min_cost_per_generations_per_run, stat=self.app_settings.plot_stat, band=self.app_settings.plot_band)
+            runs[mutation_type] = aggregate_convergence(min_cost_per_generations_per_run,
+                                                        stat=self.app_settings.plot_stat,
+                                                        band=self.app_settings.plot_band)
             min_cost_per_generations_per_run_per_mutation_type[mutation_type] = min_cost_per_generations_per_run
             average_generations[mutation_type] = average_number_of_generations
         if self.app_settings.gadapt_diversity_mutation_enabled:
@@ -249,7 +252,7 @@ class Experiment:
             csv_writter.aggregated_data_to_csv(runs, experiment_name=transform_function_string(self.experiment_name))
             csv_writter.runs_to_csv(min_cost_per_generations_per_run_per_mutation_type, experiment_name=transform_function_string(self.experiment_name))
             ga_summary = summarize_ga(min_cost_per_generations_per_run_per_mutation_type, app_settings.number_of_generations)
-            csv_writter.export_ga_summary_to_csv(ga_summary, experiment_name=transform_function_string(self._experiment_name), number_of_variables=len(self._args_bounds), saturation_generations=self.app_settings.saturation_criteria)
+            csv_writter.export_ga_summary_to_csv(ga_summary, experiment_name=transform_function_string(self.experiment_name), number_of_variables=len(self._args_bounds), saturation_generations=self.app_settings.saturation_criteria)
         if self.app_settings.plot_fitness:
             lowest, highest, max_len = analyze_runs(runs)
             fitness_range = get_fitness_range(final_results, lowest, highest)
