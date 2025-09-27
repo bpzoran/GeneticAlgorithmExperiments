@@ -4,8 +4,8 @@ from runners.experiment_runner import run_experiment
 from functions.griewank import griewank_func
 from settings.experiment_ga_settings import ExperimentGASettings
 
-variable_numbers = [2, 7]
-saturation_criterias = [10, 30]
+variable_numbers = [2, 3, 7]
+saturation_criterias = [3, 5, 10, 30]
 def execute():
     log_message_info("Griewank function")
     app_settings = ExperimentGASettings()

@@ -4,7 +4,7 @@ from runners.experiment_runner import run_experiment
 from functions.himmelblau import himmelblau_func
 from settings.experiment_ga_settings import ExperimentGASettings
 
-saturation_criterias = [10, 30]
+saturation_criterias = [3, 5, 10, 30]
 def execute():
     log_message_info("Himmelblau function")
     app_settings = ExperimentGASettings()

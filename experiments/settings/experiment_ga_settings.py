@@ -15,7 +15,7 @@ class ExperimentGASettings:
         keep_elitism_percentage: float = 50.0,
         num_runs: int = 1000,
         logging_step: int = 50,
-        number_of_generations: int = 10,
+        percentage_of_generations_for_performance: float = 0.25,
         plot_fitness: bool = True,
         saturation_criteria: int = 10,
         gadapt_random_mutation_enabled: bool = False,
@@ -36,7 +36,7 @@ class ExperimentGASettings:
         if variable_numbers is None:
             variable_numbers = [2, 3, 4, 5, 6, 7, 8, 9, 10]
         if saturation_criterias is None:
-            saturation_criterias = [5, 10, 20, 30, 50, 100]
+            saturation_criterias = [3, 5, 10, 20, 30, 50, 100]
 
         self._population_size_ = None
         self._percentage_of_mutation_chromosomes_ = None
@@ -50,7 +50,7 @@ class ExperimentGASettings:
         self._gadapt_random_mutation_enabled_ = None
         self._saturation_criteria_ = None
         self._plot_fitness_ = None
-        self._number_of_generations_ = None
+        self._percentage_of_generations_for_performance_ = None
         self._logging_step_ = None
         self._num_runs_ = None
         self._population_size = population_size
@@ -60,7 +60,7 @@ class ExperimentGASettings:
         self._keep_elitism_percentage = keep_elitism_percentage
         self._num_runs = num_runs
         self._logging_step = logging_step
-        self._number_of_generations = number_of_generations
+        self._percentage_of_generations_for_performance = percentage_of_generations_for_performance
         self._plot_fitness = plot_fitness
         self._saturation_criteria = saturation_criteria
         self._plot_stat = plot_stat
@@ -86,7 +86,7 @@ class ExperimentGASettings:
         self._keep_elitism_percentage_ = self.keep_elitism_percentage
         self._num_runs_ = self.num_runs
         self._logging_step_ = self.logging_step
-        self._number_of_generations_ = self.number_of_generations
+        self._percentage_of_generations_for_performance_ = self.percentage_of_generations_for_performance
         self._plot_fitness_ = self.plot_fitness
         self._saturation_criteria_ = self.saturation_criteria
 
@@ -109,7 +109,7 @@ class ExperimentGASettings:
         self.keep_elitism_percentage = self._keep_elitism_percentage_
         self.num_runs = self._num_runs_
         self.logging_step = self._logging_step_
-        self.number_of_generations = self._number_of_generations_
+        self.percentage_of_generations_for_performance = self._percentage_of_generations_for_performance_
         self.plot_fitness = self._plot_fitness_
         self.saturation_criteria = self._saturation_criteria_
 
@@ -196,14 +196,14 @@ class ExperimentGASettings:
         self._logging_step = value
 
     @property
-    def number_of_generations(self) -> int:
-        return self._number_of_generations
+    def percentage_of_generations_for_performance(self) -> float:
+        return self._percentage_of_generations_for_performance
 
-    @number_of_generations.setter
-    def number_of_generations(self, value: int):
+    @percentage_of_generations_for_performance.setter
+    def percentage_of_generations_for_performance(self, value: float):
         if value <= 0:
-            raise ValueError("number_of_generations must be positive")
-        self._number_of_generations = value
+            raise ValueError("percentage_of_generations_for_performance must be positive")
+        self._percentage_of_generations_for_performance = value
 
     @property
     def plot_fitness(self) -> bool:
@@ -347,7 +347,7 @@ class ExperimentGASettings:
             f"keep_elitism_percentage={self.keep_elitism_percentage}, "
             f"num_runs={self.num_runs}, "
             f"logging_step={self.logging_step}, "
-            f"number_of_generations={self.number_of_generations}, "
+            f"percentage_of_generations_for_performance={self.percentage_of_generations_for_performance}, "
             f"plot_fitness={self.plot_fitness}, "
             f"saturation_criteria={self.saturation_criteria}, "
             f"gadapt_random_mutation_enabled={self.gadapt_random_mutation_enabled}, "

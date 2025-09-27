@@ -7,6 +7,7 @@ import numpy as np
 import pygad
 
 from gadapt.ga import GA
+from gadapt.utils.ga_utils import average
 
 from plugins.pygad.pygad_blending_crossover import blend_crossover_pygad
 from utils import csv_writter
@@ -15,7 +16,8 @@ from utils.exp_logging import log_message_info
 from runners.gadapt_experiment import execute_gadapt_experiment
 from runners.pygad_experiment import execute_pygad_experiment
 from settings.experiment_ga_settings import ExperimentGASettings
-from utils.experiment_utils import transform_function_string, get_fitness_range, summarize_ga
+from utils.experiment_utils import transform_function_string, get_fitness_range, summarize_ga, \
+    number_of_generations_for_performance_check
 from utils.plot_fitness_per_generation import plot_convergence_curve
 
 
@@ -122,16 +124,16 @@ class Experiment:
             final_results["Experiment"]["Experiment name"] = transform_function_string(self._experiment_name)
             final_results["Experiment"]["Number of variables"] = len(self._args_bounds)
             final_results["Experiment"]["Saturation after generations"] = self.app_settings.saturation_criteria
+            avg_number_of_generations_for_performance = number_of_generations_for_performance_check(average_number_of_generations, self.app_settings.percentage_of_generations_for_performance)
             final_results["Experiment"][mutation_type] = {
                 "Average fitness": f"{final_min_cost:.10f}",
-                f"Average fitness after {app_settings.number_of_generations} generations": f"{mean_fitness_per_generation:.10f}",
+                f"Average fitness after {avg_number_of_generations_for_performance} generations": f"{mean_fitness_per_generation:.10f}",
                 "Average number of generations": f"{average_number_of_generations:.10f}"
             }
             runs[mutation_type] = aggregate_convergence(min_cost_per_generations_per_run,
                                                         stat=self.app_settings.plot_stat,
                                                         band=self.app_settings.plot_band)
             min_cost_per_generations_per_run_per_mutation_type[mutation_type] = min_cost_per_generations_per_run
-            average_generations[mutation_type] = average_number_of_generations
             average_generations[mutation_type] = average_number_of_generations
         if self.app_settings.gadapt_random_mutation_enabled:
             ##### GADAPT OPTIMIZATION WITH RANDOM MUTATION ###############
@@ -160,9 +162,11 @@ class Experiment:
             final_results["Experiment"]["Experiment name"] = transform_function_string(self._experiment_name)
             final_results["Experiment"]["Number of variables"] = len(self._args_bounds)
             final_results["Experiment"]["Saturation after generations"] = self.app_settings.saturation_criteria
+            avg_number_of_generations = number_of_generations_for_performance_check(average_number_of_generations,
+                                                                                    self.app_settings.percentage_of_generations_for_performance)
             final_results["Experiment"][mutation_type] = {
                 "Average fitness": f"{final_min_cost:.10f}",
-                f"Average fitness after {app_settings.number_of_generations} generations": f"{mean_fitness_per_generation:.10f}",
+                f"Average fitness after {avg_number_of_generations} generations": f"{mean_fitness_per_generation:.10f}",
                 "Average number of generations": f"{average_number_of_generations:.10f}"
             }
             runs[mutation_type] = aggregate_convergence(min_cost_per_generations_per_run,
@@ -197,9 +201,11 @@ class Experiment:
             final_results["Experiment"]["Experiment name"] = transform_function_string(self._experiment_name)
             final_results["Experiment"]["Number of variables"] = len(self._args_bounds)
             final_results["Experiment"]["Saturation after generations"] = self.app_settings.saturation_criteria
+            average_number_of_generations_for_performance = number_of_generations_for_performance_check(average_number_of_generations,
+                                                                                                        self.app_settings.percentage_of_generations_for_performance)
             final_results["Experiment"][mutation_type] = {
                 "Average fitness": f"{final_min_cost:.10f}",
-                f"Average fitness after {app_settings.number_of_generations} generations": f"{mean_fitness_per_generation:.10f}",
+                f"Average fitness after {average_number_of_generations_for_performance} generations": f"{mean_fitness_per_generation:.10f}",
                 "Average number of generations": f"{average_number_of_generations:.10f}"
             }
             runs[mutation_type] = aggregate_convergence(min_cost_per_generations_per_run, stat=self.app_settings.plot_stat, band=self.app_settings.plot_band)
@@ -235,9 +241,12 @@ class Experiment:
             final_results["Experiment"]["Experiment name"] = transform_function_string(self._experiment_name)
             final_results["Experiment"]["Number of variables"] = len(self._args_bounds)
             final_results["Experiment"]["Saturation after generations"] = self.app_settings.saturation_criteria
+            average_number_of_generations_for_performance = number_of_generations_for_performance_check(
+                average_number_of_generations,
+                self.app_settings.percentage_of_generations_for_performance)
             final_results["Experiment"][mutation_type] = {
                 "Average fitness": f"{final_min_cost:.10f}",
-                f"Average fitness after {app_settings.number_of_generations} generations": f"{mean_fitness_per_generation:.10f}",
+                f"Average fitness after {average_number_of_generations_for_performance} generations": f"{mean_fitness_per_generation:.10f}",
                 "Average number of generations": f"{average_number_of_generations:.10f}"
             }
             runs[mutation_type] = aggregate_convergence(min_cost_per_generations_per_run, stat=self.app_settings.plot_stat, band=self.app_settings.plot_band)
@@ -251,8 +260,8 @@ class Experiment:
         if app_settings.log_to_file:
             csv_writter.aggregated_data_to_csv(runs, experiment_name=transform_function_string(self.experiment_name))
             csv_writter.runs_to_csv(min_cost_per_generations_per_run_per_mutation_type, experiment_name=transform_function_string(self.experiment_name))
-            ga_summary = summarize_ga(min_cost_per_generations_per_run_per_mutation_type, app_settings.number_of_generations)
-            csv_writter.export_ga_summary_to_csv(ga_summary, experiment_name=transform_function_string(self.experiment_name), number_of_variables=len(self._args_bounds), saturation_generations=self.app_settings.saturation_criteria)
+            ga_summary = summarize_ga(min_cost_per_generations_per_run_per_mutation_type, app_settings.percentage_of_generations_for_performance)
+            csv_writter.export_ga_summary_to_csv(ga_summary, file_name=transform_function_string(self.experiment_name), experiment_name=transform_function_string(self._experiment_name), number_of_variables=len(self._args_bounds), saturation_generations=self.app_settings.saturation_criteria)
         if self.app_settings.plot_fitness:
             lowest, highest, max_len = analyze_runs(runs)
             fitness_range = get_fitness_range(final_results, lowest, highest)

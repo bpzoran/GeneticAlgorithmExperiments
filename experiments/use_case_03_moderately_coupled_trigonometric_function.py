@@ -6,7 +6,7 @@ from runners.experiment import Experiment
 from runners.experiment_runner import run_experiment
 from functions.moderately_coupled_trigonometric import moderately_coupled_trigonometric_func
 
-saturation_criterias = [10, 30]
+saturation_criterias = [3, 5, 10, 30]
 
 def execute():
     log_message_info("Simple trigonometric function")

@@ -5,6 +5,7 @@ import numpy as np
 
 from utils.exp_logging import log_message_info
 from settings.experiment_ga_settings import ExperimentGASettings
+from utils.experiment_utils import number_of_generations_for_performance_check
 
 log_message_info("Start optimization with PyGad:")
 
@@ -41,9 +42,7 @@ def execute_pygad_experiment(pygad_creator,
         # Get the best solution
         best_fitness_list.append(fitness_values[-1])
         generations_completed.append(ga_instance.generations_completed)
-        num_of_generations = app_settings.number_of_generations
-        if num_of_generations > ga_instance.generations_completed:
-            num_of_generations = ga_instance.generations_completed
+        num_of_generations = number_of_generations_for_performance_check(ga_instance.generations_completed, app_settings.percentage_of_generations_for_performance)
         fitness_per_generation.append(-ga_instance.best_solutions_fitness[num_of_generations - 1])
         if (i != 0) and (i % app_settings.logging_step == 0):
             log_message_info(f"PyGAD - {optimization_name} - Optimization number {i}.")
@@ -56,7 +55,7 @@ def execute_pygad_experiment(pygad_creator,
     final_average_generations_completed = round(np.mean(generations_completed), 10)
     pygad_avg_generation_number = f"PyGAD - {optimization_name} - Final average generations completed: {final_average_generations_completed:.10f}"
     mean_fitness_per_generation = round(np.mean(fitness_per_generation), 10)
-    pygad_avg_fitness_after_n_generations = f"PyGAD - {optimization_name} - Final average fitness after {app_settings.number_of_generations} generations: {mean_fitness_per_generation:.10f}"
+    pygad_avg_fitness_after_n_generations = f"PyGAD - {optimization_name} - Final average fitness after {app_settings.percentage_of_generations_for_performance} generations: {mean_fitness_per_generation:.10f}"
 
     log_message_info(pygad_avg_fitness)
     log_message_info(pygad_avg_generation_number)

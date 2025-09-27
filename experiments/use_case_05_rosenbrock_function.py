@@ -4,8 +4,8 @@ from runners.experiment import Experiment
 from runners.experiment_runner import run_experiment
 from functions.rosenbrock import rosenbrock_func
 
-variable_numbers = [3, 7]
-saturation_criterias = [10, 30]
+variable_numbers = [2, 3, 7]
+saturation_criterias = [3, 5, 10, 30]
 def execute():
     log_message_info("Rosenbrock function")
     app_settings = ExperimentGASettings()

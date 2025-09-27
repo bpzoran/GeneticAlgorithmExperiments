@@ -6,6 +6,7 @@ from gadapt.utils import ga_utils
 
 from utils.exp_logging import log_message_info
 from settings.experiment_ga_settings import ExperimentGASettings
+from utils.experiment_utils import number_of_generations_for_performance_check
 
 
 def execute_gadapt_experiment(ga,
@@ -29,9 +30,7 @@ def execute_gadapt_experiment(ga,
         min_cost_per_generations_per_run.append(min_cost_per_generation)
         cost_values.append(results.min_cost)
         iteration_numbers.append(float(results.number_of_iterations))
-        num_of_generations = app_settings.number_of_generations
-        if num_of_generations > results.number_of_iterations:
-            num_of_generations = results.number_of_iterations
+        num_of_generations = number_of_generations_for_performance_check(results.number_of_iterations, app_settings.percentage_of_generations_for_performance)
         fitness_per_generation.append(float(results.min_cost_per_generation[num_of_generations - 1]))
         if (i != 0) and (i % app_settings.logging_step == 0):
             final_min_cost = ga_utils.average(cost_values)
@@ -50,7 +49,7 @@ def execute_gadapt_experiment(ga,
         final_average_generations_completed = round(avg_num_of_it, 10)
         gadapt_avg_generation_number = f"GAdapt - {optimization_name} - Final average generations completed: {final_average_generations_completed:.10f}"
         mean_fitness_per_generation = round(np.mean(fitness_per_generation), 10)
-        gadapt_avg_fitness_after_n_generations = f"GAdapt - {optimization_name} - Final average fitness after {app_settings.number_of_generations} generations: {mean_fitness_per_generation:.10f}"
+        gadapt_avg_fitness_after_n_generations = f"GAdapt - {optimization_name} - Final average fitness after {app_settings.percentage_of_generations_for_performance} generations: {mean_fitness_per_generation:.10f}"
 
         log_message_info(gadapt_avg_fitness)
         log_message_info(gadapt_avg_generation_number)

@@ -4,8 +4,8 @@ from runners.experiment import Experiment
 from runners.experiment_runner import run_experiment
 from functions.ackley import ackley_func
 
-variable_numbers = [2, 7]
-saturation_criterias = [10, 30]
+variable_numbers = [2, 3, 7]
+saturation_criterias = [3, 5, 10, 30]
 def execute():
     log_message_info("Ackley function")
     app_settings = ExperimentGASettings()

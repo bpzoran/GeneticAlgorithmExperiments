@@ -4,7 +4,7 @@ from runners.experiment import Experiment
 from runners.experiment_runner import run_experiment
 from functions.separated_trig_arithmetic import separated_trig_arithmetic_func
 
-saturation_criterias = [10, 30]
+saturation_criterias = [3, 5, 10, 30]
 def execute():
     log_message_info("Separated Trig-Arithmetic Function")
     app_settings = ExperimentGASettings()

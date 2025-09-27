@@ -4,7 +4,7 @@ from runners.experiment import Experiment
 from runners.experiment_runner import run_experiment
 from functions.highly_coupled_trigonometric import highly_coupled_trigonometric_func
 
-saturation_criterias = [10, 30]
+saturation_criterias = [3, 5, 10, 30]
 def execute():
     log_message_info("Complex trigonometric function")
     app_settings = ExperimentGASettings()
