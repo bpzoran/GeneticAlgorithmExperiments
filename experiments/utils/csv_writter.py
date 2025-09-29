@@ -10,6 +10,8 @@ import csv
 import gzip
 from typing import Iterable
 
+from utils.experiment_utils import relative_early_convergence
+
 
 def aggregated_data_to_csv(data: dict, experiment_name: str = "output.csv"):
     app_settings = ExperimentGASettings()
@@ -138,7 +140,10 @@ def export_ga_summary_to_csv(
         "sd_min_fitness",
         "avg_generations_for_performance",
         "avg_generations",
+        "avg_fitness_after_first",
         "avg_fitness_after_n",
+        "relative_early_convergence",
+        "area_under_convergence_curve",
         "avg_slope_first_n",
     ]
 
@@ -171,6 +176,9 @@ def export_ga_summary_to_csv(
                 "avg_generations_for_performance": _fmt(metrics.get("avg_generations_for_performance")),
                 "avg_generations": _fmt(metrics.get("avg_generations")),
                 avg_fitness_after_n: _fmt(metrics.get(avg_fitness_after_n)),
+                "avg_fitness_after_first": _fmt(metrics.get("avg_fitness_after_first")),
+                "relative_early_convergence": _fmt(metrics.get("relative_early_convergence")),
+                "area_under_convergence_curve": _fmt(metrics.get("area_under_convergence_curve")),
                 avg_slope_first_n: _fmt(metrics.get(avg_slope_first_n)),
             }
 

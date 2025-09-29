@@ -13,6 +13,79 @@ def value_after_n(r: Run, n: int) -> float:
     idx = min(len(r) - 1, k - 1)
     return r[idx]
 
+def relative_early_convergence(r: Run, n: int) -> float:
+    val_after_n = value_after_n(r, n)
+    val_after_0 = value_after_n(r, 1)
+    min_fitness = value_after_n(r, len(r))
+    return _compute_relative_early_convergence(val_after_0, val_after_n, min_fitness)
+
+def _compute_relative_early_convergence(f0: float, f_t: float, f_final: float) -> float:
+    """
+    Compute Relative Early Convergence (REC).
+
+    REC = (f_t - f_final) / (f0 - f_final)
+
+    Parameters
+    ----------
+    f0 : float
+        Fitness at the first generation.
+    f_t : float
+        Fitness at the early checkpoint generation (e.g., generation 40).
+    f_final : float
+        Final fitness at the end of the optimization.
+
+    Returns
+    -------
+    float
+        REC value in [0, 1] if f_final < f0 and convergence is monotonic.
+        Can be outside [0, 1] if fitness values are non-monotonic.
+    """
+    denominator = f0 - f_final
+    scope = f_t - f_final
+    if denominator == 0:
+        if scope == 0:
+            return 1.0  # No change at all
+        else:
+            raise Exception("Min fitness cannot rise.")
+    return scope / denominator
+
+
+import numpy as np
+
+
+def area_under_convergence_curve(fitness_values: Run):
+    """
+    Compute the Area Under the Convergence Curve (AUCC), normalized to [0, 1] values.
+    Lower AUCC = faster/better early convergence.
+    Normalized AUCC allows comparing runs of different lengths or fitness scales.
+
+    Parameters
+    ----------
+    fitness_values : list or np.ndarray
+        Sequence of fitness values over generations (length T+1).
+
+    Returns
+    -------
+    float
+       Normalized AUCC value.
+    """
+    fitness_values = np.array(fitness_values, dtype=float)
+    T = len(fitness_values) - 1  # number of intervals
+
+    # Trapezoidal rule
+    _area = np.trapz(fitness_values, dx=1)
+    if fitness_values.min() == fitness_values.max():
+        return 1
+    f0, f_final = fitness_values[0], fitness_values[-1]
+    denom = T * abs(f0 - f_final)
+    if denom != 0:
+        area = _area / denom
+    else:
+        area = float("nan")
+    if area > 1:
+        area = 1
+    return area
+
 
 def transform_function_string(text: str) -> str:
     words = text.split()
@@ -81,6 +154,7 @@ def summarize_ga(
             "sd_min_fitness": float,           # std dev of per-run minima
             "avg_generations_for_performance": float,           # average length of runs (generations)
             "avg_fitness_after_n": float,       # average fitness after first n generations
+            "relative_early_convergence": float, # relative early convergence after first n generations
             "avg_slope_first_n": float          # average slope over first n generations
           },
           ...
@@ -103,6 +177,7 @@ def summarize_ga(
                 "avg_generations_for_performance": 0.0,
                 "avg_generations": 0.0,
                 "avg_fitness_after_n": math.nan,
+                "relative_early_convergence":  math.nan,
                 "avg_slope_first_n": math.nan,
             }
             continue
@@ -121,6 +196,14 @@ def summarize_ga(
         number_of_generations = round(stats.fmean(len(r) for r in runs))
 
         avg_after_n = stats.fmean(value_after_n(runs[i], round(avg_generations_for_performance)) for i in range(num_runs))
+        avg_after_first = stats.fmean(value_after_n(runs[i], 1) for i in range(num_runs))
+        relative_early_conv = stats.fmean(relative_early_convergence(runs[i], round(avg_generations_for_performance)) for i in range(num_runs))
+        areas_under_convergence_curve = []
+        for i in range(num_runs):
+            areas_under_convergence_curve.append(area_under_convergence_curve(runs[i]))
+
+        areas_under_conv_curve = [v for v in areas_under_convergence_curve if not math.isnan(v)]
+        area_under_conv_curve = stats.fmean(areas_under_conv_curve)
         # Fitness after first n generations (per run: clamp at last if shorter)
 
 
@@ -152,6 +235,9 @@ def summarize_ga(
             "avg_generations_for_performance": avg_generations_for_performance,
             "avg_generations": number_of_generations,
             f"avg_fitness_after_n": avg_after_n,
+            f"avg_fitness_after_first": avg_after_first,
+            f"relative_early_convergence": relative_early_conv,
+            "area_under_convergence_curve": area_under_conv_curve,
             f"avg_slope_first_n": avg_slope,
         }
 
@@ -162,3 +248,6 @@ def number_of_generations_for_performance_check(number_of_iterations: int, perce
     if result < 2:
         result = 2
     return result
+
+
+
