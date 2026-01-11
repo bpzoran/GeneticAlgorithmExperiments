@@ -9,18 +9,19 @@ The project consists of the following modules:
 ```
 genetic-algorithm-optimization/
 ├── experiments/
-│   ├── use_case_01_simple_trigonometric_arithmetic_function.py
-│   ├── use_case_02_complex_trig_function.py
-│   ├── use_case_03_simple_trig_function.py
+│   ├── use_case_01_separated_trig_arithmetic_function.py
+│   ├── use_case_02_highly_coupled_trigonometric_function.py
+│   ├── use_case_03_moderately_coupled_trigonometric_function.py
 │   ├── use_case_04_sphere_function.py
-│   ├── use_case_05_rosenbrock_function_3_variables.py
-│   ├── use_case_06_rosenbrock_function_7_variables.py
-│   ├── use_case_07_rastrigin_function_3_variables.py
-│   ├── use_case_08_rastrigin_function_7_variables.py
-│   ├── use_case_09_ackley_function_7_variables.py
-│   ├── use_case_10_griewank_function.py
-│   ├── use_case_11_beale_function.py
-│   ├── use_case_12_himmelblau_function.py
+│   ├── use_case_05_rosenbrock_function.py
+│   ├── use_case_06_rastrigin_function.py
+│   ├── use_case_07_ackley_function.py
+│   ├── use_case_08_griewank_function.py
+│   ├── use_case_09_beale_function.py
+│   ├── use_case_10_himmelblau_function.py
+│   ├── use_case_11_styblinski_tang_function.py
+│   ├── use_case_12_booth_function.py
+│   ├── all_experiments.py
 │   ├── __init__.py
 │   ├── utils/
 │   │   ├── exp_logging.py
@@ -45,29 +46,31 @@ Explanation:
 
 `experiments/`: Contains Python scripts for running different use cases.
 
-`experiments/use_case_01_simple_trigonometric_arithmetic_function.py` performes optimization for the simple trigonometric arithmetic function.
+`experiments/use_case_01_separated_trig_arithmetic_function.py` performes optimization for the separated trigonometric arithmetic function.
     
-`experiments/use_case_02_complex_trig_function.py` performs optimization for the complex trigonometric function.
+`experiments/use_case_02_highly_coupled_trigonometric_function.py` performs optimization for the highly coupled trigonometric function.
     
-`experiments/use_case_03_simple_trig_function.py` performs optimization for the simple trigonometric function.
+`experiments/use_case_03_moderately_coupled_trigonometric_function.py` performs optimization for the moderately coupled trigonometric function.
     
 `experiments/use_case_04_sphere_function.py` performs optimization for the sphere function.
     
-`experiments/use_case_05_rosenbrock_function_3_variables.py` performs optimization for the Rosenbrock function with 3 variables.
+`experiments/use_case_05_rosenbrock_function.py` performs optimization for the Rosenbrock function.
     
-`experiments/use_case_06_rosenbrock_function_7_variables.py` performs optimization for the Rosenbrock function with 7 variables.
+`experiments/use_case_06_rastrigin_function.py` performs optimization for the Rastrigin function.
     
-`experiments/use_case_07_rastrigin_function_3_variables.py` performs optimization for the Rastrigin function with 3 variables.
+`experiments/use_case_07_ackley_function.py` performs optimization for the Ackley function.
     
-`experiments/use_case_08_rastrigin_function_7_variables.py` performs optimization for the Rastrigin function with 7 variables.
+`experiments/use_case_08_griewank_function.py` performs optimization for the Griewank function.
     
-`experiments/use_case_09_ackley_function_7_variables.py` performs optimization for the Ackley function with 7 variables.
+`experiments/use_case_09_beale_function.py` performs optimization for the Beale function.
     
-`experiments/use_case_10_griewank_function.py` performs optimization for the Griewank function.
+`experiments/use_case_10_himmelblau_function.py` performs optimization for the Himmelblau function.
     
-`experiments/use_case_11_beale_function.py` performs optimization for the Beale function.
+`experiments/use_case_11_styblinski_tang_function.py` performs optimization for the Styblinski-Tang function.
     
-`experiments/use_case_12_himmelblau_function.py` performs optimization for the Himmelblau function.
+`experiments/use_case_12_booth_function.py` performs optimization for the Booth function.
+
+`experiments/all_experiments.py`: Runs all experiments sequentially.
 
 `experiments/__init__.py`: Initializes the experiments
 
@@ -118,44 +121,86 @@ pip install -r requirements.txt
 ## Running the Experiments
 To run the experiments, execute the following commands from the `experiments` folder:
 ```bash
-python use_case_01_simple_trigonometric_arithmetic_function.py
-python use_case_02_complex_trig_function.py
-python use_case_03_simple_trig_function.py
+python use_case_01_separated_trig_arithmetic_function.py
+python use_case_02_highly_coupled_trigonometric_function.py
+python use_case_03_moderately_coupled_trigonometric_function.py
 python use_case_04_sphere_function.py
-python use_case_05_rosenbrock_function_3_variables.py
-python use_case_06_rosenbrock_function_7_variables.py
-python use_case_07_rastrigin_function_3_variables.py
-python use_case_08_rastrigin_function_7_variables.py
-python use_case_09_ackley_function_7_variables.py
-python use_case_10_griewank_function.py
-python use_case_11_beale_function.py
-python use_case_12_himmelblau_function.py
+python use_case_05_rosenbrock_function.py
+python use_case_06_rastrigin_function.py
+python use_case_07_ackley_function.py
+python use_case_08_griewank_function.py
+python use_case_09_beale_function.py
+python use_case_10_himmelblau_function.py
+python use_case_11_styblinski_tang_function.py
+python use_case_12_booth_function.py
 ```
-The default number of runs for each tested strategy is 1000. To customize the number of runs, add the desired number as a parameter to the command. For example:
 
+### Running All Experiments
+
+You can run all experiments sequentially using the `all_experiments.py` script. This script automatically discovers all use case modules in the `experiments` directory and executes them one by one. It also merges the results into a single CSV file and generates a summary report.
+
+To run all experiments, execute the following command from the `experiments` folder:
 ```bash
-python use_case_06_rosenbrock_function_7_variables.py 100
+python all_experiments.py
 ```
-This will execute each strategy 100 times.
 
-To plot fitness per generation, add the `plot` parameter to the command. For example:
+### Command-Line Arguments
+
+You can customize the experiments using the following command-line arguments:
+
+**Integers:**
+- `--population_size`: Population size (default: 64)
+- `--num_runs`: Number of runs (default: 100)
+- `--logging_step`: Logging step (default: 50)
+- `--saturation_criteria`: Saturation criteria (default: 10)
+
+**Floats:**
+- `--percentage_of_mutation_chromosomes`: Percentage of mutation chromosomes (default: 60)
+- `--percentage_of_mutation_genes`: Percentage of mutation genes (default: 60)
+- `--mutation_ratio`: Mutation ratio (default: 0.1)
+- `--keep_elitism_percentage`: Keep elitism percentage (default: 50.0)
+- `--percentage_of_generations_for_performance`: Percentage of generations for performance (default: 0.25)
+
+**Booleans (accepts true/false, yes/no, 1/0):**
+- `--plot_fitness`: Plot fitness (default: True)
+- `--gadapt_random_mutation_enabled`: Gadapt random mutation enabled (default: False)
+- `--pygad_random_mutation_enabled`: Pygad random mutation enabled (default: True)
+- `--gadapt_diversity_mutation_enabled`: Gadapt diversity mutation enabled (default: True)
+- `--pygad_adaptive_mutation_enabled`: Pygad adaptive mutation enabled (default: True)
+- `--log_to_file`: Log to file (default: True)
+
+**Strings:**
+- `--plot_stat`: Plot stat (default: "mean")
+- `--plot_band`: Plot band (default: "ci")
+- `--csv_path`: CSV path (default: None)
+- `--results_path`: Results path (default: None)
+- `--plot_path`: Plot path (default: None)
+
+**Lists:**
+- `--variable_numbers`: Variable numbers (space-separated integers) (default: [2, 7])
+- `--saturation_criterias`: Saturation criterias (space-separated integers) (default: [15])
+
+### Examples
+
+Run an experiment with 100 runs:
 ```bash
-python use_case_12_himmelblau_function.py plot
+python use_case_05_rosenbrock_function.py --num_runs 100
 ```
-This will plot fitness per generation for the final run of each strategy.
 
-You can combine custom run numbers and the `plot` parameter. For example:
+Run an experiment and plot fitness:
 ```bash
-python use_case_11_beale_function.py plot 20
+python use_case_10_himmelblau_function.py --plot_fitness true
 ```
-This will execute each strategy 20 times and plot the fitness per generation for the final run of each strategy.
 
-All experiments can be run in parallel by executing the following command from the `experiments` folder:
+Run an experiment with custom population size and mutation ratio:
 ```bash
-python run_all_experiments.py
+python use_case_09_beale_function.py --population_size 128 --mutation_ratio 0.2
 ```
 
-Number of runs and plotting can be customized in the same way as described above.
+Run all experiments with 50 runs each:
+```bash
+python all_experiments.py --num_runs 50
+```
 
 ## Requirements
 - Python 3.12 or higher

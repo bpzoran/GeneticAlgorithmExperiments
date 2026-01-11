@@ -1,3 +1,4 @@
+import logging
 import math
 from typing import Tuple
 
@@ -8,6 +9,7 @@ from settings.experiment_ga_settings import ExperimentGASettings
 from utils.experiment_utils import number_of_generations_for_performance_check
 
 log_message_info("Start optimization with PyGad:")
+logger = logging.getLogger(__name__)
 
 def find_fitness_for_first_generation(func, population: np.ndarray) -> float:
     fitness = 0.0
@@ -41,8 +43,18 @@ def execute_pygad_experiment(pygad_creator,
 
         # Get the best solution
         best_fitness_list.append(fitness_values[-1])
-        generations_completed.append(ga_instance.generations_completed)
-        num_of_generations = number_of_generations_for_performance_check(ga_instance.generations_completed, app_settings.percentage_of_generations_for_performance)
+        generations_completed.append(ga_instance.generations_completed + 1)
+        num_of_generations = number_of_generations_for_performance_check(ga_instance.generations_completed + 1, app_settings.percentage_of_generations_for_performance)
+
+
+        if len(ga_instance.best_solutions_fitness) == 0:
+            logger.warning(f"No minimum cost per generation! PyGAD - {optimization_name}, i = {i}")
+            continue
+        if num_of_generations > len(ga_instance.best_solutions_fitness):
+            num_of_generations_old = num_of_generations
+            num_of_generations = len(ga_instance.best_solutions_fitness)
+            logger.warning(
+                f"num_of_generations ({num_of_generations_old}) was > len(results.min_cost_per_generation) ({len(ga_instance.best_solutions_fitness)})! - {optimization_name}, i = {i}")
         fitness_per_generation.append(-ga_instance.best_solutions_fitness[num_of_generations - 1])
         if (i != 0) and (i % app_settings.logging_step == 0):
             log_message_info(f"PyGAD - {optimization_name} - Optimization number {i}.")

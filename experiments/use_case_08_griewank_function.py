@@ -3,18 +3,18 @@ from runners.experiment import Experiment
 from runners.experiment_runner import run_experiment
 from functions.griewank import griewank_func
 from settings.experiment_ga_settings import ExperimentGASettings
-
-variable_numbers = [2, 3, 7]
-saturation_criterias = [3, 5, 10, 30]
+TITLE = "Griewank Function"
+ENABLED = True
 def execute():
-    log_message_info("Griewank function")
-    app_settings = ExperimentGASettings()
-    app_settings.saturation_criterias = list(set(app_settings.saturation_criterias) & set(saturation_criterias))
+    log_message_info(TITLE)
     experiment = Experiment(griewank_func)
-    experiment.fill_args_with_same_values(-50, 50, variable_numbers)
+    experiment.fill_args_with_same_values(-50, 50)
     experiment.execute_experiment()
 
 def main():
+    if not ENABLED:
+        log_message_info(f"{TITLE} - Experiment disabled")
+        return
     run_experiment(execute)
 
 if __name__ == "__main__":

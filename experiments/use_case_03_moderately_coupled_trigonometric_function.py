@@ -5,13 +5,11 @@ from utils.exp_logging import log_message_info
 from runners.experiment import Experiment
 from runners.experiment_runner import run_experiment
 from functions.moderately_coupled_trigonometric import moderately_coupled_trigonometric_func
-
-saturation_criterias = [3, 5, 10, 30]
+TITLE = "Moderately Coupled Trigonometric Function"
+ENABLED = False
 
 def execute():
-    log_message_info("Simple trigonometric function")
-    app_settings = ExperimentGASettings()
-    app_settings.saturation_criterias = list(set(app_settings.saturation_criterias) & set(saturation_criterias))
+    log_message_info(TITLE)
     args_bounds = [{"low": 0, "high": math.pi, "step": 0.0157},  # arg1
                    {"low": 0, "high": math.pi, "step": 0.0157},  # arg2
                    {"low": 0, "high": 200, "step": 1},  # arg3
@@ -26,6 +24,9 @@ def execute():
     experiment.execute_experiment()
 
 def main():
+    if not ENABLED:
+        log_message_info(f"{TITLE} - Experiment disabled")
+        return
     run_experiment(execute)
 
 if __name__ == "__main__":

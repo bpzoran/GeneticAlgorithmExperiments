@@ -16,6 +16,23 @@ import numpy as np
 
 from utils.experiment_utils import transform_function_string
 
+def compute_afi_percent(metrics_by_strategy, baseline, ref="diversity mutation", eps=1e-12):
+    """
+    AFI (%) = ((f_base_min - f_div_min) / (f_first - f_div_min)) * 100
+    where:
+      f_first    = metrics_by_strategy[ref]['avg_fitness_after_first']
+      f_div_min  = metrics_by_strategy[ref]['avg_min_fitness']
+      f_base_min = metrics_by_strategy[baseline]['avg_min_fitness']
+    """
+    f_first   = float(metrics_by_strategy[ref]["avg_fitness_after_first"])
+    f_div_min = float(metrics_by_strategy[ref]["avg_min_fitness"])
+    f_base_min= float(metrics_by_strategy[baseline]["avg_min_fitness"])
+
+    denom = f_first - f_div_min
+    if abs(denom) < eps:
+        return np.nan  # undefined or negligible margin from first gen to div minimum
+
+    return 100.0 * (f_base_min - f_div_min) / denom
 
 def plot_convergence_curve(
     agg,
@@ -23,7 +40,8 @@ def plot_convergence_curve(
     lowest: float,
     highest: float,
     max_len: float,
-    description: str = "GA Convergence (central tendency ± variability)",
+    #description: str = "GA Convergence (central tendency ± variability)",
+    description: str = "GA Convergence (central tendency)",
     ylabel: str = "Fitness",
     xlabel: str = "Generation",
     annotate_counts: bool = True,  # plot diagnostic figure with #runs per generation
@@ -34,6 +52,7 @@ def plot_convergence_curve(
     outdir: str | None = None,
     basename: str = "convergence",
     formats: tuple[str, ...] = ("png",),
+    metrics_by_strategy: dict | None = None,
 ):
     """
     agg:
@@ -78,7 +97,16 @@ def plot_convergence_curve(
     ax.set_ylim(lowest - ypad_bottom, highest)
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
-    ax.set_title("GA Convergence (central tendency ± variability)")
+    ax.set_title("GA Convergence (central tendency)")
+
+    # --- Shade the REC window: first n = 25% of the smallest avg-generations ---
+    min_avg_gens = min(x0_map.values()) if x0_map else None
+    if min_avg_gens is not None:
+        n_rec = int(round(0.25 * min_avg_gens))
+        if n_rec > 0:
+            ax.axvspan(0, n_rec, alpha=0.08, color='0.5', label="_nolegend_")
+            ax.text(n_rec, ax.get_ylim()[0], f" REC window: 0–{n_rec} gen",
+                    va='bottom', ha='right', fontsize=8, color='0.3')
 
     # Common styles
     vk = dict(linestyle='--', linewidth=1.5, color='0.35')
@@ -119,6 +147,20 @@ def plot_convergence_curve(
                 ax.axvline(x0_val, **{**vk, "color": line_color})
                 vline_info.append((label, x0_val, line_color))
 
+        # After plotting each strategy's main line:
+        final_x0 = float(gen[-1])  # that series' last available generation
+        final_y = float(center[-1])  # that series' final mean
+
+        # draw a short dotted segment to the right, e.g., +5% of the axis span but capped
+        x_left = final_x0 - 0.02 * (ax.get_xlim()[1] - ax.get_xlim()[0])
+        x_right = final_x0 + 0.02 * (ax.get_xlim()[1] - ax.get_xlim()[0])
+        # ensure we don't overshoot the axis
+        x_left = max(x_left, ax.get_xlim()[0])
+        x_right = min(x_right, ax.get_xlim()[1])
+
+        ax.hlines(final_y, x_left, x_right, linestyles='dotted', linewidth=1.5, color=line_color)
+
+
     ax.legend()
 
     # ---- Stack "Avg gen =" annotations so they don't overlap ----
@@ -140,6 +182,19 @@ def plot_convergence_curve(
                         xy=(x0_val, y_text), xytext=(dx, 0),
                         textcoords='offset points',
                         color=color, ha='left', va='center')
+    afi_vs_adaptive = compute_afi_percent(metrics_by_strategy, baseline="adaptive mutation")
+    afi_vs_random = compute_afi_percent(metrics_by_strategy, baseline="random mutation")
+
+    afi_text = (
+        f"AFI vs adaptive: {afi_vs_adaptive:.2f}%\n"
+        f"AFI vs random:   {afi_vs_random:.2f}%"
+    )
+    # After you've drawn the curves and set titles/labels:
+    ax.text(
+        0.01, 0.99, afi_text,
+        transform=ax.transAxes, va='top', ha='left', fontsize=9,
+        bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="0.6", alpha=0.9)
+    )
 
     saved_paths: list[str] = []
 
@@ -189,6 +244,22 @@ def plot_convergence_curve(
                 path = os.path.join(outdir_final, f"{safe_base}_counts.{ext.lstrip('.')}")
                 fig2.savefig(path, dpi=200, bbox_inches="tight")
                 saved_paths.append(path)
+                try:
+                    import csv
+                    for label, s in series_dict.items():
+                        data_path = os.path.join(outdir_final, f"{safe_base}_{label.replace(' ', '_')}.csv")
+                        with open(data_path, "w", newline="") as f:
+                            w = csv.writer(f)
+                            w.writerow(["gen", "center", "lower", "upper",
+                                        "n_at_gen" if "n_at_gen" in s else "n_at_gen (NA)"])
+                            ncol_default = np.full_like(s["gen"], 0)
+                            ncol = s.get("n_at_gen", ncol_default)
+                            for i in range(len(s["gen"])):
+                                w.writerow([s["gen"][i], s["center"][i], s["lower"][i], s["upper"][i],
+                                            ncol[i] if i < len(ncol) else ""])
+                        saved_paths.append(data_path)
+                except Exception:
+                    pass
 
         plt.close(fig)
         if fig2 is not None:

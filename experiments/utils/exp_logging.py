@@ -27,6 +27,13 @@ def init_logging(log_to_file: bool):
     if not os.path.exists(csv_path):
         os.mkdir(csv_path)
     app_settings.csv_path = csv_path
+    results_path = os.path.join(os.getcwd(), "results")
+    if not os.path.exists(results_path):
+        os.mkdir(results_path)
+    results_path = os.path.join(results_path, formatted_date_time)
+    if not os.path.exists(results_path):
+        os.mkdir(results_path)
+    app_settings.results_path = results_path
     plot_path = os.path.join(os.getcwd(), "plot")
     if not os.path.exists(plot_path):
         os.mkdir(plot_path)

@@ -9,11 +9,11 @@ class ExperimentGASettings:
     def __init__(
         self,
         population_size: int = 64,
-        percentage_of_mutation_chromosomes: float = 50,
-        percentage_of_mutation_genes: float = 50.0,
+        percentage_of_mutation_chromosomes: float = 60,
+        percentage_of_mutation_genes: float = 60,
         mutation_ratio: float = 0.1,
         keep_elitism_percentage: float = 50.0,
-        num_runs: int = 1000,
+        num_runs: int = 100,
         logging_step: int = 50,
         percentage_of_generations_for_performance: float = 0.25,
         plot_fitness: bool = True,
@@ -28,15 +28,17 @@ class ExperimentGASettings:
             variable_numbers=None,
             saturation_criterias=None,
         csv_path: str = None,
-        plot_path: str = None
+        results_path: str = None,
+        plot_path: str = None,
+        result_path: str = None,
     ):
         # Prevent reinitialization for the singleton
         if getattr(self, "_initialized", False):
             return
         if variable_numbers is None:
-            variable_numbers = [2, 3, 4, 5, 6, 7, 8, 9, 10]
+            variable_numbers = [2, 7]
         if saturation_criterias is None:
-            saturation_criterias = [3, 5, 10, 20, 30, 50, 100]
+            saturation_criterias = [15]
 
         self._population_size_ = None
         self._percentage_of_mutation_chromosomes_ = None
@@ -66,7 +68,9 @@ class ExperimentGASettings:
         self._plot_stat = plot_stat
         self._plot_band = plot_band
         self._csv_path = csv_path
+        self._results_path = results_path
         self._plot_path = plot_path
+        self._result_path = result_path
         self._gadapt_random_mutation_enabled = gadapt_random_mutation_enabled
         self._pygad_random_mutation_enabled = pygad_random_mutation_enabled
         self._gadapt_diversity_mutation_enabled = gadapt_diversity_mutation_enabled
@@ -98,6 +102,7 @@ class ExperimentGASettings:
         self._plot_stat_ = self.plot_stat
         self._plot_band_ = self.plot_band
         self._csv_path_ = self.csv_path
+        self._results_path_ = self.results_path
         self._plot_path_ = self.plot_path
         self._variable_numbers_ = self._variable_numbers
         self._saturation_criterias_ = self._saturation_criterias
@@ -121,6 +126,7 @@ class ExperimentGASettings:
         self.plot_stat = self._plot_stat_
         self.plot_band = self._plot_band_
         self.csv_path = self._csv_path_
+        self.results_path = self._results_path_
         self.plot_path = self._plot_path_
         self.variable_numbers = self._variable_numbers_
         self.saturation_criterias = self._saturation_criterias_
@@ -296,6 +302,10 @@ class ExperimentGASettings:
         return self._csv_path
 
     @property
+    def results_path(self) -> str:
+        return self._results_path
+
+    @property
     def plot_path(self) -> str:
         return self._plot_path
 
@@ -331,6 +341,12 @@ class ExperimentGASettings:
             raise ValueError("csv_path must be a string")
         self._csv_path = value
 
+    @results_path.setter
+    def results_path(self, value: str):
+        if not isinstance(value, str):
+            raise ValueError("results_path must be a string")
+        self._results_path = value
+
     @plot_path.setter
     def plot_path(self, value: str):
         if not isinstance(value, str):
@@ -358,6 +374,7 @@ class ExperimentGASettings:
             f"plot_stat={self.plot_stat}"
             f"plot_band={self.plot_band}"
             f"csv_path={self.csv_path}"
+            f"results_path={self.results_path}"
             f"plot_path={self.plot_path}"
             f"variable_numbers={self.variable_numbers}"
             f"saturation_criterias={self.saturation_criterias}"

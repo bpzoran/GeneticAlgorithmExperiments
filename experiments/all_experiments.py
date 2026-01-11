@@ -6,6 +6,7 @@ from typing import Callable, List, Optional
 
 from runners.experiment_runner import run_experiment
 from settings.experiment_ga_settings import ExperimentGASettings
+from utils.analyze_ga_results_from_csv import generate_results
 from utils.csv_writter import merge_csvs
 
 
@@ -67,14 +68,16 @@ def run_all_use_cases() -> None:
         # restore settings before each module's main()
         app_settings.restore_settings()
         main_fn()
+    final_results_merged_file_name = f"{os.path.join(app_settings.csv_path, "_final_results_merged.csv")}"
     merged_files, merged_rows = merge_csvs(
         input_dir=app_settings.csv_path,
         filename_prefix="final_results_",
-        output_file=f"{os.path.join(app_settings.csv_path, "_final_results_merged.csv")}",
+        output_file=final_results_merged_file_name,
         recursive=False,  # set True to include subfolders
         strict=False
     )
     print(f"Merged {merged_files} files, wrote {merged_rows} rows.")
+    generate_results(final_results_merged_file_name, app_settings.results_path)
 
 
 def main() -> None:

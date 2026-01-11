@@ -9,4 +9,5 @@ experiments/plots/*
 *wilcoxon_from_experiment.py
 /experiments/csv/*
 /experiments/plot/*
+/experiments/results/*
 /experiments/gadapt/*

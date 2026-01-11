@@ -20,7 +20,6 @@ from utils.experiment_utils import transform_function_string, get_fitness_range,
     number_of_generations_for_performance_check
 from utils.plot_fitness_per_generation import plot_convergence_curve
 
-
 class Experiment:
 
     def __init__(self, f: Callable, args_bounds: list[dict[str, float]] = None, experiment_name = None) -> None:
@@ -46,11 +45,13 @@ class Experiment:
 
     @args_bounds.setter
     def args_bounds(self, value: list):
-        self.args_bounds_list = []
-        if value not in self.args_bounds_list:
+        if value not in self.args_bounds_list: # Only add if not already present
             self.args_bounds_list.append(value)
 
-    def fill_args_with_same_values(self, low: float, high: float,  number_of_args: int | list[int], step: Optional[float] = None) -> None:
+    def fill_args_with_same_values(self, low: float, high: float,  number_of_args: int | list[int] = 0, step: Optional[float] = None) -> None:
+        self.args_bounds_list = []
+        if number_of_args == 0 or number_of_args is None:
+            number_of_args = ExperimentGASettings().variable_numbers
         if isinstance(number_of_args, int):
             bounds = {"low": low, "high": high, **({"step": step} if step is not None else {})}
             self.args_bounds = [bounds.copy() for _ in range(number_of_args)]
@@ -257,10 +258,11 @@ class Experiment:
         log_message_info("************Final results:************")
         for r in result_list:
             log_message_info(r)
+        ga_summary = summarize_ga(min_cost_per_generations_per_run_per_mutation_type,
+                                  app_settings.percentage_of_generations_for_performance)
         if app_settings.log_to_file:
             csv_writter.aggregated_data_to_csv(runs, experiment_name=transform_function_string(self.experiment_name))
             csv_writter.runs_to_csv(min_cost_per_generations_per_run_per_mutation_type, experiment_name=transform_function_string(self.experiment_name))
-            ga_summary = summarize_ga(min_cost_per_generations_per_run_per_mutation_type, app_settings.percentage_of_generations_for_performance)
             csv_writter.export_ga_summary_to_csv(ga_summary, file_name=transform_function_string(self.experiment_name), experiment_name=transform_function_string(self._experiment_name), number_of_variables=len(self._args_bounds), saturation_generations=self.app_settings.saturation_criteria)
         if self.app_settings.plot_fitness:
             lowest, highest, max_len = analyze_runs(runs)
@@ -273,7 +275,8 @@ class Experiment:
                                    description=self.experiment_name,
                                    outdir=app_settings.plot_path,
                                    save=app_settings.log_to_file,
-                                   basename=self.experiment_name,)
+                                   basename=self.experiment_name,
+                                   metrics_by_strategy=ga_summary)
 
 
 def analyze_runs(runs: dict[str, dict[str, np.ndarray]]):

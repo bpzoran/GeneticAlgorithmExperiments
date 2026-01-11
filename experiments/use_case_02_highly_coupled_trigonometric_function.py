@@ -3,12 +3,10 @@ from utils.exp_logging import log_message_info
 from runners.experiment import Experiment
 from runners.experiment_runner import run_experiment
 from functions.highly_coupled_trigonometric import highly_coupled_trigonometric_func
-
-saturation_criterias = [3, 5, 10, 30]
+TITLE = "Highly Coupled Trigonometric Function"
+ENABLED = False
 def execute():
-    log_message_info("Complex trigonometric function")
-    app_settings = ExperimentGASettings()
-    app_settings.saturation_criterias = list(set(app_settings.saturation_criterias) & set(saturation_criterias))
+    log_message_info(TITLE)
     args_bounds = [{"low": 1.0, "high": 4.0, "step": 0.01},  # arg1
                    {"low": 37.0, "high": 40.0, "step": 0.01},  # arg2
                    {"low": 78.0, "high": 88.0, "step": 0.1},  # arg3
@@ -21,6 +19,9 @@ def execute():
     experiment.execute_experiment()
 
 def main():
+    if not ENABLED:
+        log_message_info(f"{TITLE} - Experiment disabled")
+        return
     run_experiment(execute)
 
 if __name__ == "__main__":

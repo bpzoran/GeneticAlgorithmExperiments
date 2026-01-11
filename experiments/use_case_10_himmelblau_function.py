@@ -3,17 +3,18 @@ from runners.experiment import Experiment
 from runners.experiment_runner import run_experiment
 from functions.himmelblau import himmelblau_func
 from settings.experiment_ga_settings import ExperimentGASettings
-
-saturation_criterias = [3, 5, 10, 30]
+TITLE = "Himmelblau function"
+ENABLED = True
 def execute():
-    log_message_info("Himmelblau function")
-    app_settings = ExperimentGASettings()
-    app_settings.saturation_criterias = list(set(app_settings.saturation_criterias) & set(saturation_criterias))
+    log_message_info(TITLE)
     experiment = Experiment(himmelblau_func)
     experiment.fill_args_with_same_values(-6, 6, 2)
     experiment.execute_experiment()
 
 def main():
+    if not ENABLED:
+        log_message_info(f"{TITLE} - Experiment disabled")
+        return
     run_experiment(execute)
 
 if __name__ == "__main__":

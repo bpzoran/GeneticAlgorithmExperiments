@@ -53,38 +53,25 @@ def _compute_relative_early_convergence(f0: float, f_t: float, f_final: float) -
 import numpy as np
 
 
-def area_under_convergence_curve(fitness_values: Run):
-    """
-    Compute the Area Under the Convergence Curve (AUCC), normalized to [0, 1] values.
-    Lower AUCC = faster/better early convergence.
-    Normalized AUCC allows comparing runs of different lengths or fitness scales.
+def area_under_convergence_curve(fitness_values: Run, min_average_generations: int) -> float:
+    fitness_values_cropped = fitness_values[:min_average_generations]
+    f = np.asarray(fitness_values_cropped, dtype=float)
+    if f.size < 2:
+        return float("nan")
 
-    Parameters
-    ----------
-    fitness_values : list or np.ndarray
-        Sequence of fitness values over generations (length T+1).
+    f0, fT = f[0], f[-1]
+    if np.allclose(f0, fT):
+        return 1.0  # flat line => maximal (area = 1)
 
-    Returns
-    -------
-    float
-       Normalized AUCC value.
-    """
-    fitness_values = np.array(fitness_values, dtype=float)
-    T = len(fitness_values) - 1  # number of intervals
+    # Normalize to [0,1]: 1 at start, 0 at end (for minimization)
+    y = (f - fT) / (f0 - fT)
 
-    # Trapezoidal rule
-    _area = np.trapz(fitness_values, dx=1)
-    if fitness_values.min() == fitness_values.max():
-        return 1
-    f0, f_final = fitness_values[0], fitness_values[-1]
-    denom = T * abs(f0 - f_final)
-    if denom != 0:
-        area = _area / denom
-    else:
-        area = float("nan")
-    if area > 1:
-        area = 1
-    return area
+    # Clip to [0,1] to keep the score bounded if there’s overshoot/rebounds
+    y = np.clip(y, 0.0, 1.0)
+
+    T = len(f) - 1
+    auc = np.trapz(y, dx=1) / T  # average area per unit interval, in [0,1]
+    return float(np.clip(auc, 0.0, 1.0))
 
 
 def transform_function_string(text: str) -> str:
@@ -200,7 +187,7 @@ def summarize_ga(
         relative_early_conv = stats.fmean(relative_early_convergence(runs[i], round(avg_generations_for_performance)) for i in range(num_runs))
         areas_under_convergence_curve = []
         for i in range(num_runs):
-            areas_under_convergence_curve.append(area_under_convergence_curve(runs[i]))
+            areas_under_convergence_curve.append(area_under_convergence_curve(runs[i], round(min_average_generations)))
 
         areas_under_conv_curve = [v for v in areas_under_convergence_curve if not math.isnan(v)]
         area_under_conv_curve = stats.fmean(areas_under_conv_curve)

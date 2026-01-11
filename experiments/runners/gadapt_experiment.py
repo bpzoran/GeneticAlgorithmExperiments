@@ -1,3 +1,4 @@
+import logging
 import math
 from typing import LiteralString, Tuple
 
@@ -7,7 +8,7 @@ from gadapt.utils import ga_utils
 from utils.exp_logging import log_message_info
 from settings.experiment_ga_settings import ExperimentGASettings
 from utils.experiment_utils import number_of_generations_for_performance_check
-
+logger = logging.getLogger(__name__)
 
 def execute_gadapt_experiment(ga,
                               optimization_name: str = "",
@@ -31,6 +32,14 @@ def execute_gadapt_experiment(ga,
         cost_values.append(results.min_cost)
         iteration_numbers.append(float(results.number_of_iterations))
         num_of_generations = number_of_generations_for_performance_check(results.number_of_iterations, app_settings.percentage_of_generations_for_performance)
+        if len(results.min_cost_per_generation) == 0:
+            logger.warning(f"No minimum cost per generation! GAdapt - {optimization_name}, i = {i}")
+            continue
+        if num_of_generations > len(results.min_cost_per_generation):
+            num_of_generations_old = num_of_generations
+            num_of_generations = len(results.min_cost_per_generation)
+            logger.warning(
+                f"num_of_generations ({num_of_generations_old}) was > len(results.min_cost_per_generation) ({len(results.min_cost_per_generation)})! - {optimization_name}, i = {i}")
         fitness_per_generation.append(float(results.min_cost_per_generation[num_of_generations - 1]))
         if (i != 0) and (i % app_settings.logging_step == 0):
             final_min_cost = ga_utils.average(cost_values)
