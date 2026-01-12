@@ -152,7 +152,7 @@ You can customize the experiments using the following command-line arguments:
 - `--population_size`: Population size (default: 64)
 - `--num_runs`: Number of runs (default: 100)
 - `--logging_step`: Logging step (default: 50)
-- `--saturation_criteria`: Saturation criteria (default: 10)
+- `--saturation_criteria`: Saturation criteria (default: 15)
 
 **Floats:**
 - `--percentage_of_mutation_chromosomes`: Percentage of mutation chromosomes (default: 60)
